@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
 import './Login.css';
 
-const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
 
 function Login() {
   const navigate = useNavigate();
