@@ -1,0 +1,154 @@
+.my-tx-page {
+  padding: 2.5rem 0 5rem;
+  background: var(--color-paper);
+  min-height: calc(100vh - 130px);
+}
+
+.my-tx-state {
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.my-tx-state--error {
+  color: var(--color-red);
+}
+
+.my-tx-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 4rem 0;
+  color: var(--color-text-muted);
+}
+
+.my-tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Card */
+.my-tx-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.my-tx-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  background: var(--color-navy);
+  color: #fff;
+}
+
+.my-tx-card__invoice {
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+/* Status badge */
+.my-tx-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.my-tx-badge--unpaid {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.my-tx-badge--paid {
+  background: #d1f5e0;
+  color: #1a6e3c;
+}
+
+/* Body grid */
+.my-tx-card__body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem 1.5rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.my-tx-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.my-tx-card__value {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.my-tx-card__value--total {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-navy);
+}
+
+/* Bank transfer section (only for unpaid) */
+.my-tx-card__bank {
+  margin: 0 1.5rem 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed var(--color-border-dark);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper);
+}
+
+.my-tx-card__bank-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.my-tx-card__bank-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+
+.my-tx-card__bank-name {
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.my-tx-card__bank-acc {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 600px) {
+  .my-tx-card__body {
+    grid-template-columns: 1fr 1fr;
+  }
+  .my-tx-card__header,
+  .my-tx-card__bank {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .my-tx-card__body {
+    padding: 1rem;
+  }
+}

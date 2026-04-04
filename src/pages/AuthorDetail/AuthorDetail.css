@@ -1,0 +1,151 @@
+.author-detail {
+  padding: 3rem 0 4.5rem;
+}
+
+.author-detail__breadcrumb {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.author-detail__breadcrumb a {
+  color: var(--color-navy);
+  font-weight: 600;
+  transition: color var(--transition);
+}
+
+.author-detail__breadcrumb a:hover {
+  color: var(--color-brass);
+}
+
+.author-detail__breadcrumb span {
+  opacity: 0.4;
+}
+
+.author-detail__profile {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 3.5rem;
+  align-items: start;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 3rem;
+}
+
+.author-detail__photo-wrap {
+  position: sticky;
+  top: 90px;
+}
+
+.author-detail__photo {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  filter: grayscale(15%);
+  box-shadow: 6px 6px 0 var(--color-paper), 6px 6px 0 1px var(--color-border);
+}
+
+.author-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.author-detail__nationality {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.author-detail__name {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-style: italic;
+  line-height: 1.15;
+}
+
+.author-detail__genres {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.author-detail__divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0.25rem 0;
+}
+
+.author-detail__bio {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--color-text);
+  border-left: 3px solid var(--color-brass);
+  padding-left: 1.25rem;
+}
+
+.author-detail__books {
+  margin-bottom: 2rem;
+}
+
+.author-detail__books-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.author-detail__books-header h2 {
+  font-size: 1.4rem;
+  font-style: italic;
+}
+
+.author-detail__book-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  padding: 0.1rem 0.55rem;
+  border-radius: 50px;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.75rem;
+}
+
+.author-detail__back {
+  margin-top: 1rem;
+}
+
+.author-detail__back a {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  transition: color var(--transition);
+}
+
+.author-detail__back a:hover {
+  color: var(--color-brass);
+}
+
+@media (max-width: 680px) {
+  .author-detail__profile {
+    grid-template-columns: 1fr;
+  }
+  .author-detail__photo-wrap {
+    position: static;
+    max-width: 180px;
+    margin: 0 auto;
+  }
+}

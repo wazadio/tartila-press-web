@@ -1,0 +1,27 @@
+{
+    "name": "tartila-express-web",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "docx": "^9.6.1",
+        "file-saver": "^2.0.5",
+        "html-docx-js-typescript": "^0.1.5",
+        "mammoth": "^1.12.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-quill": "^2.0.0",
+        "react-router-dom": "^6.27.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.12",
+        "@types/react-dom": "^18.3.1",
+        "@vitejs/plugin-react": "^4.3.3",
+        "vite": "^6.0.1"
+    }
+}

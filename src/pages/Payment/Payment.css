@@ -1,0 +1,387 @@
+.payment-state {
+  padding: 4rem 1rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.payment-page {
+  padding: 2.5rem 0 5rem;
+  background: var(--color-paper);
+  min-height: calc(100vh - 130px);
+}
+
+.payment-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+}
+
+.payment-breadcrumb a {
+  color: var(--color-navy);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.payment-breadcrumb a:hover { color: var(--color-brass); }
+
+.payment-title {
+  font-size: 1.75rem;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.payment-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .payment-layout {
+    grid-template-columns: 1fr;
+  }
+  .payment-summary { order: -1; }
+}
+
+/* Form */
+.payment-form-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.payment-section__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.payment-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.payment-form .form-group:last-child { margin-bottom: 0; }
+
+.payment-form label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+}
+
+.payment-form input,
+.payment-form select,
+.payment-form textarea {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.925rem;
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.payment-form input:focus,
+.payment-form select:focus,
+.payment-form textarea:focus {
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px rgba(29, 43, 72, 0.08);
+  background: #fff;
+}
+
+.payment-form textarea { resize: vertical; }
+
+.payment-submit {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+/* Chapter selector */
+.chapter-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.chapter-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), border-color var(--transition);
+  color: var(--color-navy);
+}
+
+.chapter-btn:hover {
+  background: var(--color-navy);
+  color: #fff;
+  border-color: var(--color-navy);
+}
+
+.chapter-input {
+  width: 72px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper);
+  color: var(--color-text);
+  outline: none;
+}
+
+.chapter-input:focus {
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px rgba(29, 43, 72, 0.08);
+}
+
+/* hide number input arrows */
+.chapter-input::-webkit-outer-spin-button,
+.chapter-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.chapter-input[type=number] { -moz-appearance: textfield; }
+
+.chapter-label {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.chapter-hint {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.chapter-hint strong {
+  color: var(--color-navy);
+}
+
+/* Order Summary */
+.payment-summary__card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1.75rem;
+  position: sticky;
+  top: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.payment-summary__card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-navy), var(--color-brass));
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  margin: -1.75rem -1.75rem 1.5rem;
+}
+
+.payment-summary__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.payment-summary__pkg-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: 0.25rem;
+}
+
+.payment-summary__type {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-navy);
+  background: rgba(29, 43, 72, 0.08);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+}
+
+.payment-summary__desc {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.payment-summary__divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 1rem 0;
+}
+
+.payment-summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.payment-summary__row--discount {
+  color: #2d8a4e;
+}
+
+.payment-summary__row--total {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-bottom: 0;
+}
+
+.payment-summary__method {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--color-border);
+}
+
+.payment-summary__method-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.payment-summary__method-option {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--color-navy);
+  border-radius: var(--radius-sm);
+  background: rgba(29, 43, 72, 0.04);
+  margin-bottom: 0.5rem;
+}
+
+.payment-summary__bank-number {
+  font-size: 0.82rem;
+  color: var(--color-navy);
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.payment-summary__method-note {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* Success */
+.payment-success {
+  min-height: calc(100vh - 130px);
+  display: flex;
+  align-items: center;
+  padding: 3rem 0;
+  background: var(--color-paper);
+}
+
+.payment-success__card {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 3rem 2.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.payment-success__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #d1f5e0;
+  color: #1a6e3c;
+  font-size: 1.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.payment-success__card h2 {
+  font-size: 1.5rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.payment-success__card > p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-success__summary {
+  background: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  text-align: left;
+  margin-bottom: 1.25rem;
+}
+
+.payment-success__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.payment-success__row:last-child { border-bottom: none; }
+
+.payment-success__row--total {
+  font-weight: 700;
+  color: var(--color-navy);
+  font-size: 0.95rem;
+}
+
+.payment-success__note {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}

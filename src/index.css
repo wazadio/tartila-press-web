@@ -1,0 +1,223 @@
+/* ============================================
+   TARTILA — Global Design System
+   Editorial Book Publisher Aesthetic
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Color Palette — Deep Navy + Warm Cream + Brass Gold */
+  --color-ink:        #12111A;   /* Near-black for headings */
+  --color-navy:       #1D2B48;   /* Deep navy — primary brand */
+  --color-navy-mid:   #2C3E5D;   /* Mid navy */
+  --color-brass:      #B8913A;   /* Warm brass/gold accent */
+  --color-brass-light:#F0D898;   /* Pale gold tint */
+  --color-red:        #C0392B;   /* Editorial red for danger/accents */
+  --color-cream:      #FAF7F2;   /* Warm off-white background */
+  --color-paper:      #F2EDE4;   /* Slightly darker cream */
+  --color-surface:    #FFFFFF;
+  --color-text:       #1E1C2E;
+  --color-text-muted: #6B6878;
+  --color-border:     #E3DDD5;
+  --color-border-dark:#C8C0B4;
+
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans:  'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Spacing & Shape */
+  --radius-sm: 4px;
+  --radius:    8px;
+  --radius-lg: 14px;
+
+  /* Shadows */
+  --shadow-sm:    0 1px 4px rgba(18, 17, 26, 0.07);
+  --shadow:       0 3px 12px rgba(18, 17, 26, 0.10);
+  --shadow-hover: 0 8px 28px rgba(18, 17, 26, 0.16);
+  --shadow-card:  0 2px 8px rgba(29, 43, 72, 0.08), 0 0 0 1px var(--color-border);
+
+  /* Motion */
+  --transition: 0.22s ease;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: var(--color-text);
+  line-height: 1.65;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--color-navy);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+/* ── Container ─────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+/* ── Buttons ────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition),
+              border-color var(--transition), box-shadow var(--transition),
+              transform var(--transition);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background-color: var(--color-navy);
+  border-color: var(--color-navy);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-ink);
+  border-color: var(--color-ink);
+  color: #fff;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-navy);
+  color: #fff;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-text-muted);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.btn-ghost:hover {
+  color: var(--color-navy);
+}
+
+.btn-danger {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #a12723;
+  border-color: #a12723;
+  color: #fff;
+}
+
+/* ── Badge ──────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.18rem 0.7rem;
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  background-color: var(--color-brass-light);
+  color: #7A5C1E;
+  border: 1px solid #D9BC78;
+}
+
+/* ── Page Header ────────────────────────── */
+.page-header {
+  padding: 3rem 0 1.75rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.page-header h1 {
+  font-size: 2.25rem;
+  font-style: italic;
+}
+
+.page-header p {
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+
+/* ── Divider ────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 2rem 0;
+}

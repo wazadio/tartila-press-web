@@ -1,0 +1,29 @@
+.verify-card {
+  text-align: center;
+}
+
+.verify-card h1 {
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.verify-card p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.verify-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.verify-icon--spin {
+  animation: spin 1.5s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

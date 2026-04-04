@@ -1,0 +1,100 @@
+.book-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+}
+
+.book-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-5px);
+  border-color: var(--color-brass);
+}
+
+.book-card__cover-link {
+  display: block;
+  background-color: var(--color-paper);
+  overflow: hidden;
+}
+
+.book-card__cover {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.book-card:hover .book-card__cover {
+  transform: scale(1.04);
+}
+
+.book-card__body {
+  padding: 1.1rem 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  border-top: 2px solid var(--color-border);
+  transition: border-color var(--transition);
+}
+
+.book-card:hover .book-card__body {
+  border-top-color: var(--color-brass);
+}
+
+.book-card__title {
+  font-size: 1rem;
+  margin-top: 0.3rem;
+  line-height: 1.3;
+}
+
+.book-card__title a {
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.book-card__title a:hover {
+  color: var(--color-navy);
+}
+
+.book-card__author {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.book-card__author a {
+  color: var(--color-navy);
+  font-weight: 600;
+  transition: color var(--transition);
+}
+
+.book-card__author a:hover {
+  color: var(--color-brass);
+}
+
+.book-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--color-border);
+}
+
+.book-card__rating {
+  font-size: 0.82rem;
+  color: var(--color-brass);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.book-card__price {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}

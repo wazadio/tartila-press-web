@@ -1,0 +1,196 @@
+/* Shared by Login.jsx and Register.jsx */
+
+.auth-page {
+  min-height: calc(100vh - 130px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(ellipse 70% 60% at 15% 80%, rgba(29, 43, 72, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 20%, rgba(184, 145, 58, 0.06) 0%, transparent 70%);
+}
+
+.auth-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-navy), var(--color-brass));
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.auth-card__header {
+  margin-bottom: 2rem;
+}
+
+.auth-card__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-brass);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.auth-card__eyebrow::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background-color: var(--color-brass);
+}
+
+.auth-card__header h1 {
+  font-size: 1.75rem;
+  font-style: italic;
+  margin-bottom: 0.3rem;
+}
+
+.auth-card__header p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.form-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+}
+
+.form-group input {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.925rem;
+  font-family: var(--font-sans);
+  background-color: var(--color-paper);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.form-group input:focus {
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px rgba(29, 43, 72, 0.08);
+  background-color: #fff;
+}
+
+.input-error {
+  border-color: var(--color-red) !important;
+}
+
+.error-msg {
+  color: var(--color-red);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+  justify-content: center;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.auth-footer p {
+  margin: 0;
+}
+
+.auth-footer a {
+  color: var(--color-navy);
+  font-weight: 700;
+  transition: color var(--transition);
+}
+
+.auth-footer a:hover {
+  color: var(--color-brass);
+}
+
+.auth-api-error { margin-bottom: 1rem; text-align: center; }
+
+/* Google button */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--transition), box-shadow var(--transition);
+  margin-bottom: 1.25rem;
+}
+
+.btn-google:hover {
+  background: var(--color-paper);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}

@@ -1,0 +1,32 @@
+.check-email-card {
+  text-align: center;
+}
+
+.check-email__icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.check-email__tips {
+  background: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.check-email__tips p {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.4rem;
+}
+
+.check-email__tips ul {
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
