@@ -11,7 +11,7 @@ import {
   TextRun,
 } from 'docx';
 import 'react-quill/dist/quill.snow.css';
-import { authorsApi, booksApi, uploadsApi } from '../../services/api';
+import { authorsApi, booksApi, uploadsApi, genresApi } from '../../services/api';
 import './BookEditor.css';
 
 const editorModules = {
@@ -426,7 +426,7 @@ function BookEditor() {
   const [coverUploadError, setCoverUploadError] = useState('');
 
   useEffect(() => {
-    const fetches = [authorsApi.list(), booksApi.genres()];
+    const fetches = [authorsApi.list(), genresApi.list()];
     if (isEditing) fetches.push(booksApi.get(id));
 
     Promise.all(fetches)
@@ -803,7 +803,7 @@ function BookEditor() {
               <select id="genre" name="genre" value={form.genre} onChange={handleChange} className={errors.genre ? 'input-error' : ''}>
                 <option value="">Select genre…</option>
                 {genres.map((g) => (
-                  <option key={g} value={g}>{g}</option>
+                  <option key={g.id} value={g.name}>{g.name}</option>
                 ))}
                 <option value="Other">Other</option>
               </select>
