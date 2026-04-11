@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { packagesApi, booksApi, bookChaptersApi } from '../../services/api';
 import { useLang } from '../../context/LanguageContext';
 import './Packages.css';
+import '../BookCatalog/BookCatalog.css';
 
 const TYPE_ICON = {
   per_chapter: '📄',
@@ -168,59 +169,85 @@ function Packages() {
       {activeTab === 'books' && (
         <section className="packages-books">
           <div className="container">
-            <h2 className="packages-books__title">Buku Tersedia untuk Pembelian Per Bab</h2>
-            <p className="packages-books__subtitle">Pilih buku dan bab yang ingin Anda terbitkan secara terpisah.</p>
+            <div className="page-header">
+              <h2>Buku Tersedia untuk Pembelian Per Bab</h2>
+              <p>Pilih buku dan bab yang ingin Anda terbitkan secara terpisah.</p>
+            </div>
             {templateBooks.length === 0 ? (
-              <p className="packages-loading">Belum ada buku yang tersedia.</p>
+              <div className="catalog-empty">
+                <span className="catalog-empty__icon">📭</span>
+                Belum ada buku yang tersedia.
+              </div>
             ) : (
-              <div className="template-book-list">
-                {templateBooks.map((book) => {
-                  const isOpen = expandedBookId === book.id;
-                  const chapters = chaptersMap[book.id];
-                  return (
-                    <div key={book.id} className={`template-book-item${isOpen ? ' template-book-item--open' : ''}`}>
-                      <button className="template-book-header" onClick={() => toggleBook(book.id)}>
-                        <div className="template-book-header__left">
-                          {book.cover && <img src={book.cover} alt={book.title} className="template-book-cover" />}
-                          <div>
-                            <div className="template-book-title">{book.title}</div>
-                            <div className="template-book-meta">{book.author} · {book.genre}{book.bidang_name ? ` · ${book.bidang_name}` : ''}</div>
+              <>
+                <p className="catalog-count">
+                  Menampilkan <strong>{templateBooks.length}</strong> buku
+                </p>
+                <div className="books-grid">
+                  {templateBooks.map((book) => {
+                    const isOpen = expandedBookId === book.id;
+                    const chapters = chaptersMap[book.id];
+                    return (
+                      <div key={book.id} className={`pkg-book-card${isOpen ? ' pkg-book-card--open' : ''}`}>
+                        <button
+                          type="button"
+                          className="pkg-book-card__cover-btn"
+                          onClick={() => toggleBook(book.id)}
+                          aria-expanded={isOpen}
+                        >
+                          <img
+                            src={book.cover || `https://placehold.co/300x420?text=${encodeURIComponent(book.title)}`}
+                            alt={book.title}
+                            className="pkg-book-card__cover"
+                            onError={(e) => { e.target.src = `https://placehold.co/300x420?text=${encodeURIComponent(book.title)}`; }}
+                          />
+                          <div className="pkg-book-card__cover-overlay">
+                            <span>{isOpen ? '▲ Tutup' : '▼ Lihat Bab'}</span>
                           </div>
-                        </div>
-                        <span className="template-book-toggle">{isOpen ? '▲' : '▼'}</span>
-                      </button>
-                      {isOpen && (
-                        <div className="template-book-chapters">
-                          {!chapters ? (
-                            <p className="template-book-loading">Memuat bab…</p>
-                          ) : chapters.length === 0 ? (
-                            <p className="template-book-empty">Belum ada bab yang ditentukan.</p>
-                          ) : (
-                            <table className="template-chapters-table">
-                              <thead>
-                                <tr>
-                                  <th>No.</th>
-                                  <th>Judul Bab</th>
-                                  <th>Harga</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {chapters.map((ch) => (
-                                  <tr key={ch.id}>
-                                    <td>{ch.number}</td>
-                                    <td>{ch.title}</td>
-                                    <td>{ch.price > 0 ? fmt(ch.price) : '—'}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                        </button>
+                        <div className="pkg-book-card__body">
+                          {book.genre && <span className="badge">{book.genre}</span>}
+                          <h3 className="pkg-book-card__title">{book.title}</h3>
+                          {book.bidang_name && (
+                            <p className="pkg-book-card__author">{book.bidang_name}</p>
+                          )}
+                          {book.author && (
+                            <p className="pkg-book-card__author">{book.author}</p>
                           )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                        {isOpen && (
+                          <div className="pkg-book-card__chapters">
+                            {!chapters ? (
+                              <p className="pkg-book-card__loading">Memuat bab…</p>
+                            ) : chapters.length === 0 ? (
+                              <p className="pkg-book-card__empty">Belum ada bab.</p>
+                            ) : (
+                              <table className="template-chapters-table">
+                                <thead>
+                                  <tr>
+                                    <th>No.</th>
+                                    <th>Judul Bab</th>
+                                    <th>Harga</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {chapters.map((ch) => (
+                                    <tr key={ch.id}>
+                                      <td>{ch.number}</td>
+                                      <td>{ch.title}</td>
+                                      <td>{ch.price > 0 ? fmt(ch.price) : '—'}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
         </section>

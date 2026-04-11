@@ -358,27 +358,23 @@ function Payment() {
                             onClick={() => handleBookCardClick(b)}
                           >
                             <div className="book-grid-item__cover-wrap">
-                              <img
-                                src={b.cover || `https://placehold.co/300x420?text=${encodeURIComponent(b.title)}`}
-                                alt={b.title}
-                                className="book-grid-item__cover"
-                                onError={(e) => { e.target.src = `https://placehold.co/300x420?text=${encodeURIComponent(b.title)}`; }}
-                              />
+                              {b.cover
+                                ? <img
+                                    src={b.cover} alt={b.title}
+                                    className="book-grid-item__cover"
+                                    onClick={(e) => { e.stopPropagation(); setLightboxSrc(b.cover); }}
+                                    title="Klik untuk memperbesar"
+                                  />
+                                : <div className="book-grid-item__cover-placeholder">📖</div>
+                              }
                               {isConfirmed && <div className="book-grid-item__check">✓</div>}
                             </div>
-                            <div className="book-grid-item__body">
-                              {b.genre && <span className="badge">{b.genre}</span>}
-                              <h3 className="book-grid-item__title">{b.title}</h3>
-                              {b.bidang_name && (
-                                <p className="book-grid-item__bidang">{b.bidang_name}</p>
-                              )}
-                              {b.chapter_price > 0 && (
-                                <div className="book-grid-item__meta">
-                                  <span className="book-grid-item__price">
-                                    Rp {b.chapter_price.toLocaleString('id-ID')}<small>/bab</small>
-                                  </span>
-                                </div>
-                              )}
+                            <div className="book-grid-item__info">
+                              <div className="book-grid-item__title">{b.title}</div>
+                              <div className="book-grid-item__tags">
+                                {b.bidang_name && <span className="book-grid-item__tag book-grid-item__tag--bidang">{b.bidang_name}</span>}
+                                {b.genre && <span className="book-grid-item__tag">{b.genre}</span>}
+                              </div>
                             </div>
                           </button>
                         );
