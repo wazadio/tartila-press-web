@@ -22,7 +22,7 @@ function Navbar() {
       <nav className="navbar">
         <div className="container navbar__inner">
           <Link to={isAdmin ? '/admin' : '/'} className="navbar__brand">
-            <span className="navbar__brand-icon">📚</span>
+            <img src="/favicon.jpeg" alt="Tartila" className="navbar__brand-logo" />
             Tartila
           </Link>
           <span className="navbar__sep" />

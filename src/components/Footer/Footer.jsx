@@ -10,7 +10,10 @@ function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brand">
-          <span className="footer__logo">📚 Tartila</span>
+          <div className="footer__logo">
+            <img src="/favicon.jpeg" alt="Tartila" className="footer__logo-img" />
+            Tartila
+          </div>
           <p>{f.tagline}</p>
           <span className="footer__tagline">{f.excellence}</span>
         </div>

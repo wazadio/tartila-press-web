@@ -44,6 +44,14 @@
   font-size: 1.2rem;
 }
 
+.navbar__brand-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .navbar__brand:hover {
   color: var(--color-brass);
   text-decoration: none;
