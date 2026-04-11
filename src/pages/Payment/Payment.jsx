@@ -228,6 +228,8 @@ function Payment() {
             ? 'Chapters: ' + selectedChapters.map((c) => `Ch.${c.number} ${c.title}`).join(', ')
             : '',
         ].filter(Boolean).join('\n'),
+        book_id: selectedBook ? selectedBook.id : null,
+        chapter_ids: selectedChapters.map((c) => c.id),
       });
       setTransaction(created);
       setBankName(created.bank_name || bankName);
@@ -638,18 +640,30 @@ function Payment() {
                   <>
                     <h3 className="book-modal__section-title">Pilih Bab yang Ingin Dipesan</h3>
                     <div className="chapter-checklist">
-                      {availableChapters.map((ch) => (
-                        <label key={ch.id} className={`chapter-checklist__item${selectedChapterIds.includes(ch.id) ? ' chapter-checklist__item--checked' : ''}`}>
-                          <input
-                            type="checkbox"
-                            checked={selectedChapterIds.includes(ch.id)}
-                            onChange={() => toggleChapter(ch.id)}
-                          />
-                          <span className="chapter-checklist__num">Bab {ch.number}</span>
-                          <span className="chapter-checklist__title">{ch.title}</span>
-                          {ch.price > 0 && <span className="chapter-checklist__price">{fmt(ch.price)}</span>}
-                        </label>
-                      ))}
+                      {availableChapters.map((ch) => {
+                        const outOfStock = ch.stock != null && ch.stock <= 0;
+                        return (
+                          <label
+                            key={ch.id}
+                            className={`chapter-checklist__item${selectedChapterIds.includes(ch.id) ? ' chapter-checklist__item--checked' : ''}${outOfStock ? ' chapter-checklist__item--disabled' : ''}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedChapterIds.includes(ch.id)}
+                              onChange={() => toggleChapter(ch.id)}
+                              disabled={outOfStock}
+                            />
+                            <span className="chapter-checklist__num">Bab {ch.number}</span>
+                            <span className="chapter-checklist__title">{ch.title}</span>
+                            {ch.price > 0 && <span className="chapter-checklist__price">{fmt(ch.price)}</span>}
+                            {ch.stock != null && (
+                              <span className={`chapter-checklist__stock${outOfStock ? ' chapter-checklist__stock--empty' : ''}`}>
+                                {outOfStock ? 'Habis' : `Sisa ${ch.stock}`}
+                              </span>
+                            )}
+                          </label>
+                        );
+                      })}
                     </div>
                     {errors.chapters && <p className="error-msg" style={{ marginTop: '0.5rem' }}>{errors.chapters}</p>}
                     {selectedChapterIds.length > 0 && (

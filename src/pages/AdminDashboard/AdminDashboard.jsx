@@ -293,6 +293,7 @@ function AdminDashboard() {
   const [txDrafts, setTxDrafts] = useState({});
   const [txSavingId, setTxSavingId] = useState(null);
   const [txError, setTxError] = useState('');
+  const [editingTx, setEditingTx] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleteError, setDeleteError] = useState('');
   const [activeTab, setActiveTab] = useState('books');
@@ -358,7 +359,14 @@ function AdminDashboard() {
           delivery_deadline: updated.delivery_deadline ? String(updated.delivery_deadline).slice(0, 10) : '',
         },
       }));
+      setEditingTx(null);
     } catch (err) {
+      // If backend rejected due to stock exhaustion, refresh transaction list to show the badge
+      if (err.message && err.message.includes('Stok')) {
+        setTransactions((prev) =>
+          prev.map((item) => item.id === tx.id ? { ...item, stock_exhausted: true } : item)
+        );
+      }
       setTxError(err.message || a.updateTransactionFailed);
     } finally {
       setTxSavingId(null);
@@ -495,12 +503,9 @@ function AdminDashboard() {
   ];
 
   return (
+    <>
     <div className="admin">
       <div className="container">
-        <div className="page-header">
-          <h1>{a.title}</h1>
-          <p>{a.subtitle}</p>
-        </div>
 
         {/* Stats */}
         <div className="admin-stats">
@@ -784,7 +789,6 @@ function AdminDashboard() {
                       <th>{a.colPrice}</th>
                       <th>{a.txUserAccount}</th>
                       <th>{a.transactionStatus}</th>
-                      <th>{a.deliveryDeadline}</th>
                       <th>{a.colActions}</th>
                     </tr>
                   </thead>
@@ -824,29 +828,19 @@ function AdminDashboard() {
                             )}
                           </td>
                           <td>
-                            <select
-                              value={draft.status}
-                              onChange={(e) => updateTxDraft(tx.id, { status: e.target.value })}
-                            >
-                              <option value="unpaid">{a.statusUnpaid}</option>
-                              <option value="paid">{a.statusPaid}</option>
-                            </select>
-                          </td>
-                          <td>
-                            <input
-                              type="date"
-                              value={draft.delivery_deadline}
-                              disabled={deadlineLocked}
-                              onChange={(e) => updateTxDraft(tx.id, { delivery_deadline: e.target.value })}
-                            />
+                            <span className={`tx-status-badge tx-status-badge--${tx.status}`}>
+                              {tx.status === 'paid' ? a.statusPaid : a.statusUnpaid}
+                            </span>
+                            {tx.stock_exhausted && (
+                              <span className="tx-stock-badge">⚠ Stok Habis</span>
+                            )}
                           </td>
                           <td>
                             <button
                               className="btn btn-secondary btn-sm"
-                              onClick={() => handleSaveTransaction(tx)}
-                              disabled={txSavingId === tx.id}
+                              onClick={() => { setEditingTx(tx); setTxError(''); }}
                             >
-                              {txSavingId === tx.id ? a.saving : a.saveTransaction}
+                              {a.edit || 'Edit'}
                             </button>
                           </td>
                         </tr>
@@ -972,6 +966,112 @@ function AdminDashboard() {
 
       </div>
     </div>
+
+    {/* ── Transaction Edit Modal ─────────────────────────────────────── */}
+    {editingTx && (() => {
+      const draft = getTxDraft(editingTx);
+      const deadlineLocked = draft.status !== 'unpaid';
+      return (
+        <>
+          <div className="tx-modal__backdrop" onClick={() => { setEditingTx(null); setTxError(''); }} />
+          <div className="tx-modal" role="dialog" aria-modal="true">
+            <div className="tx-modal__header">
+              <h2 className="tx-modal__title">Edit Transaksi #{editingTx.id}</h2>
+              <button className="tx-modal__close" onClick={() => { setEditingTx(null); setTxError(''); }} aria-label="Tutup">&times;</button>
+            </div>
+
+            <div className="tx-modal__body">
+              {/* Detail read-only */}
+              <div className="tx-modal__info-grid">
+                <div className="tx-modal__info-row">
+                  <span className="tx-modal__info-label">Pelanggan</span>
+                  <span className="tx-modal__info-value">
+                    <strong>{editingTx.customer_name}</strong><br />
+                    <small>{editingTx.customer_email}</small><br />
+                    <small>{editingTx.customer_phone}</small>
+                  </span>
+                </div>
+                <div className="tx-modal__info-row">
+                  <span className="tx-modal__info-label">Buku</span>
+                  <span className="tx-modal__info-value">
+                    <strong>{editingTx.book_title}</strong><br />
+                    <small>{editingTx.genre}</small>
+                    {editingTx.package_type === 'per_chapter' && <small> · {editingTx.chapters} bab</small>}
+                  </span>
+                </div>
+                <div className="tx-modal__info-row">
+                  <span className="tx-modal__info-label">Paket</span>
+                  <span className="tx-modal__info-value">{editingTx.package_name}</span>
+                </div>
+                <div className="tx-modal__info-row">
+                  <span className="tx-modal__info-label">Total</span>
+                  <span className="tx-modal__info-value" style={{ fontWeight: 700, color: 'var(--color-navy)' }}>{fmt(editingTx.total_amount)}</span>
+                </div>
+                <div className="tx-modal__info-row">
+                  <span className="tx-modal__info-label">Tanggal</span>
+                  <span className="tx-modal__info-value">{fmtDateTime(editingTx.created_at)}</span>
+                </div>
+                {editingTx.notes && (
+                  <div className="tx-modal__info-row">
+                    <span className="tx-modal__info-label">Catatan</span>
+                    <span className="tx-modal__info-value" style={{ fontStyle: 'italic', fontSize: '0.85rem' }}>{editingTx.notes}</span>
+                  </div>
+                )}
+              </div>
+
+              {editingTx.stock_exhausted && (
+                <div className="tx-modal__stock-warn">⚠ Stok habis — tidak dapat diubah menjadi Lunas</div>
+              )}
+
+              {/* Editable fields */}
+              <div className="tx-modal__fields">
+                <div className="form-group">
+                  <label>Status</label>
+                  <select
+                    value={draft.status}
+                    onChange={(e) => updateTxDraft(editingTx.id, { status: e.target.value })}
+                  >
+                    <option value="unpaid">{a.statusUnpaid}</option>
+                    <option value="paid">{a.statusPaid}</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>{a.deliveryDeadline}</label>
+                  <input
+                    type="date"
+                    value={draft.delivery_deadline}
+                    disabled={deadlineLocked}
+                    onChange={(e) => updateTxDraft(editingTx.id, { delivery_deadline: e.target.value })}
+                  />
+                  {deadlineLocked && (
+                    <span className="form-hint">Deadline hanya bisa diatur saat status Belum Lunas.</span>
+                  )}
+                </div>
+              </div>
+
+              {txError && <p className="error-msg" style={{ marginTop: '0.75rem' }}>{txError}</p>}
+            </div>
+
+            <div className="tx-modal__footer">
+              <button
+                className="btn btn-secondary"
+                onClick={() => { setEditingTx(null); setTxError(''); }}
+              >
+                Batal
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => handleSaveTransaction(editingTx)}
+                disabled={txSavingId === editingTx.id}
+              >
+                {txSavingId === editingTx.id ? a.saving : a.saveTransaction}
+              </button>
+            </div>
+          </div>
+        </>
+      );
+    })()}
+    </>
   );
 }
 

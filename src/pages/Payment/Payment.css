@@ -1042,6 +1042,27 @@
   flex-shrink: 0;
 }
 
+.chapter-checklist__stock {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(29, 43, 72, 0.08);
+  color: var(--color-navy);
+  flex-shrink: 0;
+}
+
+.chapter-checklist__stock--empty {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.chapter-checklist__item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Order Summary */
 .payment-summary__card {
   background: var(--color-surface);

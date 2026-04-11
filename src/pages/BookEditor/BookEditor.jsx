@@ -419,6 +419,7 @@ function BookEditor() {
     bidang_id: '',
     synopsis: '',
     cover: '',
+    stock: '',
     chapters: [createChapter(1, '', '')],
   });
 
@@ -454,6 +455,7 @@ function BookEditor() {
             bidang_id: existing.bidang_id || '',
             synopsis: existing.synopsis || '',
             cover: existing.cover || '',
+            stock: existing.stock ?? '',
             chapters: [createChapter(1, 'Chapter 1', toEditorHtml(existing.description || ''))],
           });
           // load sellable chapters
@@ -502,6 +504,7 @@ function BookEditor() {
       bidang_id: form.bidang_id ? Number(form.bidang_id) : null,
       synopsis: form.synopsis || null,
       cover: form.cover || null,
+      stock: form.stock !== '' ? Number(form.stock) : null,
       description: mergedDescription,
     };
 
@@ -516,7 +519,7 @@ function BookEditor() {
       }
       // save sellable chapters
       if (savedId) {
-        await bookChaptersApi.replace(savedId, sellableChapters.map(({ number, title, price }) => ({ number, title, price })));
+        await bookChaptersApi.replace(savedId, sellableChapters.map(({ number, title, price, stock }) => ({ number, title, price, stock: stock !== '' && stock != null ? Number(stock) : null })));
       }
       navigate('/admin');
     } catch (err) {
@@ -802,6 +805,20 @@ function BookEditor() {
             <label htmlFor="is_template">This book is a <strong>Per-Chapter template</strong> (available for selection in per-chapter package orders)</label>
           </div>
 
+          <div className="form-group" style={{ maxWidth: '20rem' }}>
+            <label htmlFor="stock">Stock Buku (Kuota)</label>
+            <input
+              id="stock"
+              name="stock"
+              type="number"
+              min="0"
+              value={form.stock}
+              onChange={handleChange}
+              placeholder="Kosongkan = tidak terbatas"
+            />
+            <span className="form-hint">Jumlah maksimal buku yang bisa dipesan. Biarkan kosong jika tidak terbatas.</span>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="bidang_id">Bidang</label>
@@ -1028,7 +1045,7 @@ function BookEditor() {
                 className="btn btn-secondary btn-sm"
                 onClick={() => setSellableChapters((prev) => [
                   ...prev,
-                  { number: prev.length + 1, title: '', price: 0 },
+                  { number: prev.length + 1, title: '', price: 0, stock: '' },
                 ])}
               >
                 + Add Chapter
@@ -1046,6 +1063,7 @@ function BookEditor() {
                       <th>#</th>
                       <th>Chapter Title</th>
                       <th>Price (Rp)</th>
+                      <th>Stock</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -1077,6 +1095,16 @@ function BookEditor() {
                             value={ch.price}
                             onChange={(e) => setSellableChapters((prev) => prev.map((c, idx) => idx === i ? { ...c, price: parseInt(e.target.value) || 0 } : c))}
                             style={{ width: '7rem' }}
+                          />
+                        </td>
+                        <td style={{ width: '7rem' }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={ch.stock ?? ''}
+                            onChange={(e) => setSellableChapters((prev) => prev.map((c, idx) => idx === i ? { ...c, stock: e.target.value !== '' ? parseInt(e.target.value) : '' } : c))}
+                            placeholder="∞"
+                            style={{ width: '6rem' }}
                           />
                         </td>
                         <td style={{ width: '3rem' }}>
