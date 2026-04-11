@@ -11,7 +11,7 @@ import {
   TextRun,
 } from 'docx';
 import 'react-quill/dist/quill.snow.css';
-import { authorsApi, booksApi, uploadsApi, genresApi, bookChaptersApi } from '../../services/api';
+import { authorsApi, booksApi, uploadsApi, genresApi, bookChaptersApi, bidangApi } from '../../services/api';
 import './BookEditor.css';
 
 const editorModules = {
@@ -402,6 +402,7 @@ function BookEditor() {
 
   const [authors, setAuthors] = useState([]);
   const [genres, setGenres] = useState([]);
+  const [bidangList, setBidangList] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [saveError, setSaveError] = useState('');
 
@@ -415,7 +416,7 @@ function BookEditor() {
     price: '',
     featured: false,
     is_template: false,
-    bidang: '',
+    bidang_id: '',
     cover: '',
     chapters: [createChapter(1, '', '')],
   });
@@ -430,13 +431,14 @@ function BookEditor() {
   const [sellableChapters, setSellableChapters] = useState([]);
 
   useEffect(() => {
-    const fetches = [authorsApi.list(), genresApi.list()];
+    const fetches = [authorsApi.list(), genresApi.list(), bidangApi.list()];
     if (isEditing) fetches.push(booksApi.get(id));
 
     Promise.all(fetches)
-      .then(([authorList, genreList, existing]) => {
+      .then(([authorList, genreList, bidList, existing]) => {
         setAuthors(authorList);
         setGenres(genreList);
+        setBidangList(bidList);
         if (existing) {
           setForm({
             title: existing.title || '',
@@ -448,7 +450,7 @@ function BookEditor() {
             price: existing.price || '',
             featured: existing.featured || false,
             is_template: existing.is_template || false,
-            bidang: existing.bidang || '',
+            bidang_id: existing.bidang_id || '',
             cover: existing.cover || '',
             chapters: [createChapter(1, 'Chapter 1', toEditorHtml(existing.description || ''))],
           });
@@ -495,7 +497,7 @@ function BookEditor() {
       price: Number(form.price),
       featured: form.featured,
       is_template: form.is_template,
-      bidang: form.bidang || null,
+      bidang_id: form.bidang_id ? Number(form.bidang_id) : null,
       cover: form.cover || null,
       description: mergedDescription,
     };
@@ -794,20 +796,24 @@ function BookEditor() {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="bidang">Bidang</label>
-              <input
-                id="bidang" name="bidang" type="text"
-                value={form.bidang} onChange={handleChange}
-                placeholder="e.g. Ilmu Sosial, Sains, Sastra…"
-              />
+              <label htmlFor="bidang_id">Bidang</label>
+              <select id="bidang_id" name="bidang_id" value={form.bidang_id} onChange={handleChange}>
+                <option value="">— Pilih Bidang —</option>
+                {bidangList.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="genre">Genre *</label>
               <select id="genre" name="genre" value={form.genre} onChange={handleChange} className={errors.genre ? 'input-error' : ''}>
                 <option value="">Select genre…</option>
-                {genres.map((g) => (
-                  <option key={g.id} value={g.name}>{g.name}</option>
-                ))}
+                {genres
+                  .filter((g) => !form.bidang_id || g.bidang_id === Number(form.bidang_id))
+                  .map((g) => (
+                    <option key={g.id} value={g.name}>{g.name}</option>
+                  ))
+                }
                 <option value="Other">Other</option>
               </select>
               {errors.genre && <span className="error-msg">{errors.genre}</span>}

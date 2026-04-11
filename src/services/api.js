@@ -97,6 +97,15 @@ export const genresApi = {
   delete: (id) => request(`/genres/${id}`, { method: 'DELETE' }),
 };
 
+// ── Bidang ────────────────────────────────────────────────────────────────────
+
+export const bidangApi = {
+  list: () => request('/bidang'),
+  create: (body) => request('/bidang', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/bidang/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  delete: (id) => request(`/bidang/${id}`, { method: 'DELETE' }),
+};
+
 // ── Book Chapters ─────────────────────────────────────────────────────────────
 
 export const bookChaptersApi = {

@@ -1,15 +1,55 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { authorsApi, booksApi, packagesApi, genresApi, transactionsApi } from '../../services/api';
+import { authorsApi, booksApi, packagesApi, genresApi, transactionsApi, bidangApi } from '../../services/api';
 import { useLang } from '../../context/LanguageContext';
 import './AdminDashboard.css';
 
 const EMPTY_PKG = { name: '', type: 'per_chapter', description: '', price: '', discount: 0 };
 const EMPTY_GENRE = { name: '', name_id: '' };
+const EMPTY_BIDANG = { name: '' };
 
-function GenreForm({ initial, onSave, onCancel, a }) {
+function BidangForm({ initial, onSave, onCancel, a }) {
+  const [name, setName] = useState(initial.name || '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!name.trim()) { setError('Nama bidang wajib diisi.'); return; }
+    setSaving(true);
+    setError('');
+    try {
+      await onSave({ name: name.trim() });
+    } catch (err) {
+      setError(err.message || a.saveFailed);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form className="pkg-form" onSubmit={handleSubmit}>
+      <div className="pkg-form__row">
+        <div className="pkg-form__field">
+          <label>Nama Bidang</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Ilmu Sosial, Sains, Sastra…" />
+        </div>
+      </div>
+      {error && <p className="error-msg">{error}</p>}
+      <div className="pkg-form__actions">
+        <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
+          {saving ? a.saving : initial.id ? 'Update Bidang' : 'Tambah Bidang'}
+        </button>
+        <button type="button" className="btn btn-secondary btn-sm" onClick={onCancel}>{a.cancel}</button>
+      </div>
+    </form>
+  );
+}
+
+function GenreForm({ initial, onSave, onCancel, a, bidangList }) {
   const [name, setName] = useState(initial.name || '');
   const [nameId, setNameId] = useState(initial.name_id || '');
+  const [bidangId, setBidangId] = useState(initial.bidang_id || '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -19,7 +59,7 @@ function GenreForm({ initial, onSave, onCancel, a }) {
     setSaving(true);
     setError('');
     try {
-      await onSave({ name: name.trim(), name_id: nameId.trim() || null });
+      await onSave({ name: name.trim(), name_id: nameId.trim() || null, bidang_id: bidangId ? Number(bidangId) : null });
     } catch (err) {
       setError(err.message || a.saveFailed);
     } finally {
@@ -37,6 +77,15 @@ function GenreForm({ initial, onSave, onCancel, a }) {
         <div className="pkg-form__field">
           <label>{a.genreNameId}</label>
           <input value={nameId} onChange={(e) => setNameId(e.target.value)} placeholder={a.genreNameIdPlaceholder} />
+        </div>
+        <div className="pkg-form__field">
+          <label>Bidang</label>
+          <select value={bidangId} onChange={(e) => setBidangId(e.target.value)}>
+            <option value="">— Pilih Bidang —</option>
+            {bidangList.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
         </div>
       </div>
       {error && <p className="error-msg">{error}</p>}
@@ -239,6 +288,7 @@ function AdminDashboard() {
   const [authors, setAuthors] = useState([]);
   const [packages, setPackages] = useState([]);
   const [genres, setGenres] = useState([]);
+  const [bidangList, setBidangList] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [txDrafts, setTxDrafts] = useState({});
   const [txSavingId, setTxSavingId] = useState(null);
@@ -250,13 +300,15 @@ function AdminDashboard() {
   const [editingPkg, setEditingPkg] = useState(null);
   const [showGenreForm, setShowGenreForm] = useState(false);
   const [editingGenre, setEditingGenre] = useState(null);
+  const [showBidangForm, setShowBidangForm] = useState(false);
+  const [editingBidang, setEditingBidang] = useState(null);
   const [editingAuthor, setEditingAuthor] = useState(null);
   const { t } = useLang();
   const a = t.admin;
 
   useEffect(() => {
-    Promise.allSettled([booksApi.list(), authorsApi.list(), packagesApi.list(), genresApi.list(), transactionsApi.list()])
-      .then(([b, au, p, g, tx]) => {
+    Promise.allSettled([booksApi.list(), authorsApi.list(), packagesApi.list(), genresApi.list(), transactionsApi.list(), bidangApi.list()])
+      .then(([b, au, p, g, tx, bd]) => {
         if (b.status === 'fulfilled') setBooks(b.value);
         else console.error('[admin] books fetch failed:', b.reason);
         if (au.status === 'fulfilled') setAuthors(au.value);
@@ -265,6 +317,8 @@ function AdminDashboard() {
         else console.error('[admin] packages fetch failed:', p.reason);
         if (g.status === 'fulfilled') setGenres(g.value);
         else console.error('[admin] genres fetch failed:', g.reason);
+        if (bd.status === 'fulfilled') setBidangList(bd.value);
+        else console.error('[admin] bidang fetch failed:', bd.reason);
         if (tx.status === 'fulfilled') setTransactions(tx.value);
         else console.error('[admin] transactions fetch failed:', tx.reason);
       })
@@ -374,6 +428,32 @@ function AdminDashboard() {
   function startAddGenre() { setEditingGenre(null); setShowGenreForm(true); }
   function cancelGenreForm() { setShowGenreForm(false); setEditingGenre(null); }
 
+  async function handleSaveBidang(data) {
+    if (editingBidang) {
+      const updated = await bidangApi.update(editingBidang.id, data);
+      setBidangList((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+    } else {
+      const created = await bidangApi.create(data);
+      setBidangList((prev) => [...prev].concat(created).sort((a, b) => a.name.localeCompare(b.name)));
+    }
+    setShowBidangForm(false);
+    setEditingBidang(null);
+  }
+
+  async function handleDeleteBidang(item) {
+    if (!window.confirm(`Hapus bidang "${item.name}"?`)) return;
+    try {
+      await bidangApi.delete(item.id);
+      setBidangList((prev) => prev.filter((b) => b.id !== item.id));
+    } catch (err) {
+      alert(err.message || a.deleteFailed);
+    }
+  }
+
+  function startEditBidang(item) { setEditingBidang(item); setShowBidangForm(true); }
+  function startAddBidang() { setEditingBidang(null); setShowBidangForm(true); }
+  function cancelBidangForm() { setShowBidangForm(false); setEditingBidang(null); }
+
   async function handleSaveAuthor(data) {
     const updated = await authorsApi.update(editingAuthor.id, data);
     setAuthors((prev) => prev.map((au) => (au.id === updated.id ? updated : au)));
@@ -400,6 +480,7 @@ function AdminDashboard() {
     { key: 'packages', label: a.publishingPackages, count: packages.length },
     { key: 'transactions', label: a.transactionsTab, count: transactions.length },
     { key: 'genres', label: a.genresTab, count: genres.length },
+    { key: 'bidang', label: 'Bidang', count: bidangList.length },
   ];
 
   return (
@@ -485,7 +566,7 @@ function AdminDashboard() {
                       <tr key={book.id}>
                         <td><Link to={`/books/${book.id}`}>{book.title}</Link></td>
                         <td>{book.author}</td>
-                        <td>{book.bidang || '—'}</td>
+        <td>{book.bidang_name || '—'}</td>
                         <td><span className="badge">{book.genre}</span></td>
                         <td>{book.published_year}</td>
                         <td>Rp {book.price.toLocaleString('id-ID')}</td>
@@ -759,6 +840,7 @@ function AdminDashboard() {
                 onSave={handleSaveGenre}
                 onCancel={cancelGenreForm}
                 a={a}
+                bidangList={bidangList}
               />
             )}
 
@@ -774,6 +856,7 @@ function AdminDashboard() {
                       <th>#</th>
                       <th>{a.genreName}</th>
                       <th>{a.genreNameId}</th>
+                      <th>Bidang</th>
                       <th>{a.colActions}</th>
                     </tr>
                   </thead>
@@ -783,10 +866,64 @@ function AdminDashboard() {
                         <td style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem' }}>{i + 1}</td>
                         <td style={{ fontWeight: 600 }}>{genre.name}</td>
                         <td style={{ color: 'var(--color-text-muted)' }}>{genre.name_id || '—'}</td>
+                        <td>{genre.bidang_name || '—'}</td>
                         <td>
                           <div className="admin-actions">
                             <button className="btn btn-secondary btn-sm" onClick={() => startEditGenre(genre)}>{a.edit}</button>
                             <button className="btn btn-danger btn-sm" onClick={() => handleDeleteGenre(genre)}>{a.delete}</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Bidang Tab */}
+        {activeTab === 'bidang' && (
+          <div className="admin-tab-panel">
+            <div className="admin-section__header">
+              <h2>Bidang</h2>
+              {!showBidangForm && (
+                <button className="btn btn-primary" onClick={startAddBidang}>+ Tambah Bidang</button>
+              )}
+            </div>
+
+            {showBidangForm && (
+              <BidangForm
+                initial={editingBidang ? { ...editingBidang } : EMPTY_BIDANG}
+                onSave={handleSaveBidang}
+                onCancel={cancelBidangForm}
+                a={a}
+              />
+            )}
+
+            {loading ? (
+              <p>{a.loading}</p>
+            ) : bidangList.length === 0 ? (
+              <p className="admin-empty">Belum ada bidang.</p>
+            ) : (
+              <div className="admin-table-wrapper">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nama Bidang</th>
+                      <th>{a.colActions}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bidangList.map((item, i) => (
+                      <tr key={item.id}>
+                        <td style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem' }}>{i + 1}</td>
+                        <td style={{ fontWeight: 600 }}>{item.name}</td>
+                        <td>
+                          <div className="admin-actions">
+                            <button className="btn btn-secondary btn-sm" onClick={() => startEditBidang(item)}>{a.edit}</button>
+                            <button className="btn btn-danger btn-sm" onClick={() => handleDeleteBidang(item)}>{a.delete}</button>
                           </div>
                         </td>
                       </tr>

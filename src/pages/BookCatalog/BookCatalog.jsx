@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import BookCard from '../../components/BookCard/BookCard';
-import { booksApi, genresApi } from '../../services/api';
+import { booksApi, genresApi, bidangApi } from '../../services/api';
 import { useLang } from '../../context/LanguageContext';
 import './BookCatalog.css';
 
@@ -9,7 +9,7 @@ function BookCatalog() {
   const [genres, setGenres] = useState([]);
   const [bidangList, setBidangList] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('All');
-  const [selectedBidang, setSelectedBidang] = useState('All');
+  const [selectedBidangId, setSelectedBidangId] = useState(null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const { t, lang } = useLang();
@@ -17,11 +17,7 @@ function BookCatalog() {
 
   useEffect(() => {
     genresApi.list().then(setGenres).catch(() => {});
-    // derive bidang list from all books
-    booksApi.list().then((all) => {
-      const unique = [...new Set(all.map((b) => b.bidang).filter(Boolean))].sort();
-      setBidangList(unique);
-    }).catch(() => {});
+    bidangApi.list().then(setBidangList).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -29,12 +25,12 @@ function BookCatalog() {
     const params = {};
     if (search) params.search = search;
     if (selectedGenre !== 'All') params.genre = selectedGenre;
-    if (selectedBidang !== 'All') params.bidang = selectedBidang;
+    if (selectedBidangId !== null) params.bidang_id = selectedBidangId;
     booksApi.list(params)
       .then(setBooks)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [search, selectedGenre, selectedBidang]);
+  }, [search, selectedGenre, selectedBidangId]);
 
   return (
     <div className="book-catalog">
@@ -60,15 +56,15 @@ function BookCatalog() {
             <div className="catalog-filters">
               <span className="catalog-filters-label">Bidang</span>
               <button
-                className={`filter-btn${selectedBidang === 'All' ? ' active' : ''}`}
-                onClick={() => setSelectedBidang('All')}
+                className={`filter-btn${selectedBidangId === null ? ' active' : ''}`}
+                onClick={() => setSelectedBidangId(null)}
               >{c.all}</button>
               {bidangList.map((b) => (
                 <button
-                  key={b}
-                  className={`filter-btn${selectedBidang === b ? ' active' : ''}`}
-                  onClick={() => setSelectedBidang(b)}
-                >{b}</button>
+                  key={b.id}
+                  className={`filter-btn${selectedBidangId === b.id ? ' active' : ''}`}
+                  onClick={() => setSelectedBidangId(b.id)}
+                >{b.name}</button>
               ))}
             </div>
           )}
@@ -80,15 +76,18 @@ function BookCatalog() {
             >
               {c.all}
             </button>
-            {genres.map((g) => (
-              <button
-                key={g.id}
-                className={`filter-btn${selectedGenre === g.name ? ' active' : ''}`}
-                onClick={() => setSelectedGenre(g.name)}
-              >
-                {lang === 'id' && g.name_id ? g.name_id : g.name}
-              </button>
-            ))}
+            {genres
+              .filter((g) => selectedBidangId === null || g.bidang_id === selectedBidangId)
+              .map((g) => (
+                <button
+                  key={g.id}
+                  className={`filter-btn${selectedGenre === g.name ? ' active' : ''}`}
+                  onClick={() => setSelectedGenre(g.name)}
+                >
+                  {lang === 'id' && g.name_id ? g.name_id : g.name}
+                </button>
+              ))
+            }
           </div>
         </div>
 
