@@ -307,7 +307,7 @@ function AdminDashboard() {
   const a = t.admin;
 
   useEffect(() => {
-    Promise.allSettled([booksApi.list(), authorsApi.list(), packagesApi.list(), genresApi.list(), transactionsApi.list(), bidangApi.list()])
+    Promise.allSettled([booksApi.list(), authorsApi.listAll(), packagesApi.list(), genresApi.list(), transactionsApi.list(), bidangApi.list()])
       .then(([b, au, p, g, tx, bd]) => {
         if (b.status === 'fulfilled') setBooks(b.value);
         else console.error('[admin] books fetch failed:', b.reason);
@@ -470,6 +470,17 @@ function AdminDashboard() {
     }
   }
 
+  async function handleToggleVerifyAuthor(author) {
+    try {
+      const updated = author.is_verified
+        ? await authorsApi.unverify(author.id)
+        : await authorsApi.verify(author.id);
+      setAuthors((prev) => prev.map((au) => (au.id === updated.id ? updated : au)));
+    } catch (err) {
+      alert(err.message || 'Failed to update author verification.');
+    }
+  }
+
   function startEditAuthor(author) {
     setEditingAuthor(author);
   }
@@ -628,6 +639,7 @@ function AdminDashboard() {
                       <th>{a.authorNationality}</th>
                       <th>{a.authorBooksPublished}</th>
                       <th>{a.authorGenres}</th>
+                      <th>Status</th>
                       <th>{a.colActions}</th>
                     </tr>
                   </thead>
@@ -644,7 +656,26 @@ function AdminDashboard() {
                         <td>{author.books_published ?? 0}</td>
                         <td style={{ fontSize: '0.82rem' }}>{author.genres?.join(', ') || '—'}</td>
                         <td>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '0.15rem 0.55rem',
+                            borderRadius: '999px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            background: author.is_verified ? 'rgba(34,139,34,0.1)' : 'rgba(180,0,0,0.08)',
+                            color: author.is_verified ? '#1a6e1a' : '#b40000',
+                          }}>
+                            {author.is_verified ? '✓ Terverifikasi' : '✗ Belum'}
+                          </span>
+                        </td>
+                        <td>
                           <div className="admin-actions">
+                            <button
+                              className={`btn btn-sm ${author.is_verified ? 'btn-secondary' : 'btn-primary'}`}
+                              onClick={() => handleToggleVerifyAuthor(author)}
+                            >
+                              {author.is_verified ? 'Batalkan' : 'Verifikasi'}
+                            </button>
                             <button className="btn btn-secondary btn-sm" onClick={() => startEditAuthor(author)}>{a.edit}</button>
                             <button className="btn btn-danger btn-sm" onClick={() => handleDeleteAuthor(author)}>{a.delete}</button>
                           </div>

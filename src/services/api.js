@@ -49,10 +49,13 @@ export const booksApi = {
 
 export const authorsApi = {
   list: () => request('/authors'),
+  listAll: () => request('/authors/all'),
   get: (id) => request(`/authors/${id}`),
   create: (body) => request('/authors', { method: 'POST', body: JSON.stringify(body) }),
   update: (id, body) => request(`/authors/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
   delete: (id) => request(`/authors/${id}`, { method: 'DELETE' }),
+  verify: (id) => request(`/authors/${id}/verify`, { method: 'PATCH' }),
+  unverify: (id) => request(`/authors/${id}/unverify`, { method: 'PATCH' }),
   // Writer-specific endpoints
   me: () => request('/authors/me'),
   updateMe: (body) => request('/authors/me', { method: 'PATCH', body: JSON.stringify(body) }),

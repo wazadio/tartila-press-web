@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
@@ -8,11 +9,25 @@ function Navbar() {
   const { lang, t, toggle } = useLang();
   const navigate = useNavigate();
   const isAdmin = user?.role === 'admin';
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   function handleLogout() {
     logout();
+    setDropdownOpen(false);
     navigate('/');
   }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header>
@@ -37,9 +52,6 @@ function Navbar() {
                 {user?.role === 'writer' && (
                   <NavLink to="/writer/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>{t.navbar.writerDashboard}</NavLink>
                 )}
-                {user && (
-                  <NavLink to="/my-orders" className={({ isActive }) => isActive ? 'active' : ''}>{t.navbar.myOrders}</NavLink>
-                )}
               </>
             )}
           </div>
@@ -48,10 +60,63 @@ function Navbar() {
               {lang === 'en' ? '🇮🇩 ID' : '🇬🇧 EN'}
             </button>
             {user ? (
-              <>
-                <span className="navbar__user">{t.navbar.hi}, {user.name}</span>
-                <button className="btn btn-secondary" onClick={handleLogout}>{t.navbar.logout}</button>
-              </>
+              <div className="navbar__user-menu" ref={dropdownRef}>
+                <button
+                  className="navbar__user-btn"
+                  onClick={() => setDropdownOpen((o) => !o)}
+                  aria-haspopup="true"
+                  aria-expanded={dropdownOpen}
+                >
+                  <span className="navbar__user-avatar">
+                    {user.name?.[0]?.toUpperCase()}
+                  </span>
+                  <span className="navbar__user-name">{user.name}</span>
+                  <span className={`navbar__user-caret${dropdownOpen ? ' navbar__user-caret--open' : ''}`}>▾</span>
+                </button>
+
+                {dropdownOpen && (
+                  <div className="navbar__dropdown">
+                    <div className="navbar__dropdown-header">
+                      <span className="navbar__dropdown-name">{user.name}</span>
+                      <span className="navbar__dropdown-email">{user.email}</span>
+                    </div>
+                    <div className="navbar__dropdown-divider" />
+                    {!isAdmin && (
+                      <>
+                        <Link
+                          to="/my-orders"
+                          className="navbar__dropdown-item"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          📋 {t.navbar.myOrders}
+                        </Link>
+                        {user.role === 'writer' && (
+                          <Link
+                            to="/writer/dashboard"
+                            className="navbar__dropdown-item"
+                            onClick={() => setDropdownOpen(false)}
+                          >
+                            ✏️ {t.navbar.writerDashboard}
+                          </Link>
+                        )}
+                        <div className="navbar__dropdown-divider" />
+                      </>
+                    )}
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="navbar__dropdown-item"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        ⚙️ {t.navbar.admin}
+                      </Link>
+                    )}
+                    <button className="navbar__dropdown-item navbar__dropdown-item--danger" onClick={handleLogout}>
+                      {t.navbar.logout}
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link to="/login" className="btn btn-secondary">{t.navbar.login}</Link>
