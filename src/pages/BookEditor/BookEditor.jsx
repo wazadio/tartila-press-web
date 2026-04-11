@@ -464,27 +464,6 @@ function BookEditor() {
     if (!form.publishedYear || isNaN(Number(form.publishedYear))) errs.publishedYear = 'Valid year required.';
     if (!form.pages || isNaN(Number(form.pages))) errs.pages = 'Valid page count required.';
     if (!form.price || isNaN(Number(form.price))) errs.price = 'Valid price required.';
-
-    if (!Array.isArray(form.chapters) || form.chapters.length === 0) {
-      errs.chapters = 'At least one chapter is required.';
-    } else {
-      const chapterErrors = form.chapters.map((chapter, index) => {
-        const chapterError = {};
-        if (!chapter.title.trim()) {
-          chapterError.title = `Chapter ${index + 1} title is required.`;
-        }
-        const plainContent = getPlainTextFromHtml(chapter.content || '');
-        if (!plainContent) {
-          chapterError.content = `Chapter ${index + 1} content is required.`;
-        }
-        return chapterError;
-      });
-
-      if (chapterErrors.some((chapterError) => Object.keys(chapterError).length > 0)) {
-        errs.chapterItems = chapterErrors;
-      }
-    }
-
     return errs;
   }
 
@@ -877,8 +856,15 @@ function BookEditor() {
 
           <div className="chapters-section">
             <div className="chapters-section__header">
-              <label>Book Chapters *</label>
+              <label>Book Chapters <span style={{color:'var(--color-text-muted)',fontWeight:400,fontSize:'0.85rem'}}>(optional)</span></label>
               <div className="chapters-section__actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setUseRichEditor((v) => !v)}
+                >
+                  {useRichEditor ? 'Switch to Plain Text' : 'Switch to Rich Editor'}
+                </button>
                 <label className="btn btn-secondary file-upload-btn" htmlFor="word-upload-input">
                   {isImporting ? 'Importing…' : 'Import .docx'}
                 </label>
@@ -951,7 +937,7 @@ function BookEditor() {
                     </div>
 
                     <div className="form-group">
-                      <label htmlFor={`chapter-title-${chapter.id}`}>Chapter Title *</label>
+                      <label htmlFor={`chapter-title-${chapter.id}`}>Chapter Title</label>
                       <input
                         id={`chapter-title-${chapter.id}`}
                         type="text"
@@ -963,16 +949,6 @@ function BookEditor() {
                       {chapterError.title && <span className="error-msg">{chapterError.title}</span>}
                     </div>
 
-                    <div className="form-group__editor-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                      <label>Content *</label>
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => setUseRichEditor((v) => !v)}
-                      >
-                        {useRichEditor ? 'Switch to Plain Text' : 'Switch to Rich Editor'}
-                      </button>
-                    </div>
                     {useRichEditor ? (
                       <div className={`rich-editor${chapterError.content ? ' input-error' : ''}`}>
                         <ReactQuill
