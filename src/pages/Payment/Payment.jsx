@@ -296,20 +296,22 @@ function Payment() {
                     </select>
                   </div>
 
-                  {/* Step 2: Genre (filtered by bidang) */}
-                  {selectedBidangId && (
-                    <div className="form-group">
-                      <label>{p.genre} *</label>
-                      <select value={selectedGenreFilter} onChange={handleGenreFilterSelect}>
-                        <option value="">— Pilih Genre —</option>
-                        {genreList
-                          .filter((g) => String(g.bidang_id) === String(selectedBidangId))
-                          .map((g) => (
+                  {/* Step 2: Genre (filtered by bidang, fallback to all) */}
+                  {selectedBidangId && (() => {
+                    const linked = genreList.filter((g) => String(g.bidang_id) === String(selectedBidangId));
+                    const options = linked.length > 0 ? linked : genreList;
+                    return (
+                      <div className="form-group">
+                        <label>{p.genre} *</label>
+                        <select value={selectedGenreFilter} onChange={handleGenreFilterSelect}>
+                          <option value="">— Pilih Genre —</option>
+                          {options.map((g) => (
                             <option key={g.id} value={g.name}>{genreLabel(g, lang)}</option>
                           ))}
-                      </select>
-                    </div>
-                  )}
+                        </select>
+                      </div>
+                    );
+                  })()}
 
                   {/* Step 3: Book (filtered by genre) */}
                   {selectedGenreFilter && (
