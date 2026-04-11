@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { booksApi } from '../../services/api';
+import { useCart } from '../../context/CartContext';
 import { useLang } from '../../context/LanguageContext';
 import './BookDetail.css';
 
@@ -9,6 +10,8 @@ function BookDetail() {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const { addItem } = useCart();
+  const navigate = useNavigate();
   const { t } = useLang();
   const d = t.bookDetail;
 
@@ -94,7 +97,25 @@ function BookDetail() {
               <span className="book-detail__price">
                 Rp {book.price.toLocaleString('id-ID')}
               </span>
-              <button className="btn btn-primary">{d.addToCart}</button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  addItem({
+                    type: 'per_book',
+                    packageId: null,
+                    bookId: book.id,
+                    bookTitle: book.title,
+                    bookCover: book.cover || null,
+                    genre: book.genre,
+                    author: book.author || null,
+                    chapters: [],
+                    totalAmount: 0,
+                  });
+                  navigate('/cart');
+                }}
+              >
+                {d.addToCart}
+              </button>
             </div>
           </div>
         </div>

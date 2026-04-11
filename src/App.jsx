@@ -21,6 +21,8 @@ import WriterLogin from './pages/WriterLogin/WriterLogin';
 import WriterDashboard from './pages/WriterDashboard/WriterDashboard';
 import Payment from './pages/Payment/Payment';
 import MyTransactions from './pages/MyTransactions/MyTransactions';
+import Cart from './pages/Cart/Cart';
+import { CartProvider } from './context/CartContext';
 import './App.css';
 
 function AdminRoute({ children }) {
@@ -62,6 +64,7 @@ function AppRoutes() {
           <Route path="/writer/dashboard" element={<WriterRoute><WriterDashboard /></WriterRoute>} />
           <Route path="/payment/:id" element={<Payment />} />
           <Route path="/my-orders" element={<MyTransactions />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </main>
       <Footer />
@@ -73,7 +76,9 @@ function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <AppRoutes />
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
       </AuthProvider>
     </LanguageProvider>
   );

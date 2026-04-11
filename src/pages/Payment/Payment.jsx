@@ -85,10 +85,21 @@ function Payment() {
                 setSelectedBookId(String(book.id));
                 setSelectedBook(book);
                 setForm((prev) => ({ ...prev, bookTitle: book.title || '', genre: book.genre || '' }));
+                const preChapterIds = searchParams.get('chapters');
                 bookChaptersApi.list(book.id)
-                  .then((chs) => setAvailableChapters(chs))
+                  .then((chs) => {
+                    setAvailableChapters(chs);
+                    if (preChapterIds) {
+                      const ids = preChapterIds.split(',').map(Number).filter(Boolean);
+                      const validIds = chs.filter((c) => ids.includes(c.id)).map((c) => c.id);
+                      setSelectedChapterIds(validIds);
+                      setBookConfirmed(true);
+                    }
+                  })
                   .catch(() => {});
-                setBookModalOpen(true);
+                if (!preChapterIds) {
+                  setBookModalOpen(true);
+                }
               }
             }
           }).catch(() => {});

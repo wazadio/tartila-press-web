@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { packagesApi, booksApi, bookChaptersApi } from '../../services/api';
+import { useCart } from '../../context/CartContext';
 import { useLang } from '../../context/LanguageContext';
 import './Packages.css';
 import '../BookCatalog/BookCatalog.css';
@@ -48,6 +49,7 @@ function PackageCard({ pkg, p }) {
 
 function Packages() {
   const navigate = useNavigate();
+  const { addItem } = useCart();
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -55,6 +57,7 @@ function Packages() {
   const [templateBooks, setTemplateBooks] = useState([]);
   const [modalBook, setModalBook] = useState(null);
   const [chaptersMap, setChaptersMap] = useState({});
+  const [selectedModalChapterIds, setSelectedModalChapterIds] = useState([]);
   const { t } = useLang();
   const p = t.packages;
 
@@ -70,6 +73,7 @@ function Packages() {
 
   function openBookModal(book) {
     setModalBook(book);
+    setSelectedModalChapterIds([]);
     if (!chaptersMap[book.id]) {
       bookChaptersApi.list(book.id)
         .then((chs) => setChaptersMap((prev) => ({ ...prev, [book.id]: chs })))
@@ -230,7 +234,7 @@ function Packages() {
                         <button
                           type="button"
                           className="pkg-book-card__select-btn"
-                          onClick={() => navigateToPayment(book)}
+                          onClick={() => openBookModal(book)}
                         >
                           Pilih Bab →
                         </button>
@@ -283,23 +287,104 @@ function Packages() {
                   <table className="pkgmodal__table">
                     <thead>
                       <tr>
+                        <th style={{ width: '2rem' }}></th>
                         <th>No.</th>
                         <th>Judul Bab</th>
                         <th>Harga</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {chapters.map((ch) => (
-                        <tr key={ch.id}>
-                          <td className="pkgmodal__table-num">{ch.number}</td>
-                          <td>{ch.title}</td>
-                          <td className="pkgmodal__table-price">{ch.price > 0 ? fmt(ch.price) : '—'}</td>
-                        </tr>
-                      ))}
+                      {chapters.map((ch) => {
+                        const checked = selectedModalChapterIds.includes(ch.id);
+                        const outOfStock = ch.stock != null && ch.stock <= 0;
+                        return (
+                          <tr
+                            key={ch.id}
+                            className={`pkgmodal__row${checked ? ' pkgmodal__row--selected' : ''}${outOfStock ? ' pkgmodal__row--disabled' : ''}`}
+                            onClick={() => !outOfStock && setSelectedModalChapterIds((prev) =>
+                              prev.includes(ch.id) ? prev.filter((x) => x !== ch.id) : [...prev, ch.id]
+                            )}
+                          >
+                            <td>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                disabled={outOfStock}
+                                onChange={() => {}}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </td>
+                            <td className="pkgmodal__table-num">{ch.number}</td>
+                            <td>
+                              {ch.title}
+                              {outOfStock && <span className="pkgmodal__stock-empty"> — Habis</span>}
+                            </td>
+                            <td className="pkgmodal__table-price">{ch.price > 0 ? fmt(ch.price) : '—'}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}
               </div>
+
+              {/* Modal Footer */}
+              {chapters && chapters.length > 0 && (() => {
+                const perChapterPkg = packages.find((pkg) => pkg.type === 'per_chapter');
+                const selectedChapters = chapters.filter((ch) => selectedModalChapterIds.includes(ch.id));
+                const totalPrice = selectedChapters.reduce((sum, ch) => sum + (ch.price || (perChapterPkg?.final_price || 0)), 0);
+                return (
+                  <div className="pkgmodal__footer">
+                    <div className="pkgmodal__footer-info">
+                      {selectedModalChapterIds.length > 0
+                        ? <span>{selectedModalChapterIds.length} bab dipilih{totalPrice > 0 ? ` — ${fmt(totalPrice)}` : ''}</span>
+                        : <span className="pkgmodal__footer-hint">Pilih bab yang ingin dipesan</span>
+                      }
+                    </div>
+                    <div className="pkgmodal__footer-actions">
+                      <button type="button" className="btn btn-secondary btn-sm" onClick={closeBookModal}>Batal</button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        disabled={selectedModalChapterIds.length === 0 || !perChapterPkg}
+                        onClick={() => {
+                          if (!perChapterPkg) return;
+                          addItem({
+                            type: 'per_chapter',
+                            packageId: perChapterPkg.id,
+                            packageName: perChapterPkg.name,
+                            bookId: modalBook.id,
+                            bookTitle: modalBook.title,
+                            bookCover: modalBook.cover || null,
+                            genre: modalBook.genre || '',
+                            author: modalBook.author || null,
+                            chapters: selectedChapters,
+                            unitPrice: perChapterPkg.final_price,
+                            totalAmount: totalPrice,
+                          });
+                          closeBookModal();
+                          navigate('/cart');
+                        }}
+                      >
+                        🛒 Keranjang
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        disabled={selectedModalChapterIds.length === 0 || !perChapterPkg}
+                        onClick={() => {
+                          if (!perChapterPkg) return;
+                          const chIds = selectedModalChapterIds.join(',');
+                          closeBookModal();
+                          navigate(`/payment/${perChapterPkg.id}?book=${modalBook.id}&chapters=${chIds}`);
+                        }}
+                      >
+                        Pesan Sekarang →
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </>
         );
