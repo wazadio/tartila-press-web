@@ -49,9 +49,6 @@ function Navbar() {
                 <NavLink to="/books" className={({ isActive }) => isActive ? 'active' : ''}>{t.navbar.books}</NavLink>
                 <NavLink to="/authors" className={({ isActive }) => isActive ? 'active' : ''}>{t.navbar.authors}</NavLink>
                 <NavLink to="/packages" className={({ isActive }) => isActive ? 'active' : ''}>{t.navbar.packages}</NavLink>
-                {user?.role === 'writer' && (
-                  <NavLink to="/writer/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>{t.navbar.writerDashboard}</NavLink>
-                )}
               </>
             )}
           </div>
