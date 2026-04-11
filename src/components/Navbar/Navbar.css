@@ -287,40 +287,6 @@
   border-color: var(--color-brass);
 }
 
-.navbar__cart {
-  position: relative;
-  display: flex;
-  align-items: center;
-  font-size: 1.2rem;
-  line-height: 1;
-  text-decoration: none;
-  padding: 0.2rem 0.3rem;
-  border-radius: var(--radius-sm);
-  transition: background var(--transition);
-}
-
-.navbar__cart:hover {
-  background: var(--color-paper);
-}
-
-.navbar__cart-badge {
-  position: absolute;
-  top: -4px;
-  right: -6px;
-  background: var(--color-brass, #b8860b);
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 700;
-  border-radius: 999px;
-  min-width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 3px;
-  line-height: 1;
-}
-
 @media (max-width: 680px) {
   .navbar__links,
   .navbar__sep {

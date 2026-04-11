@@ -1,0 +1,328 @@
+.buybook-page {
+  padding: 2rem 0 4rem;
+}
+
+.buybook-notfound {
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.buybook-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+}
+
+.buybook-breadcrumb a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.buybook-breadcrumb a:hover {
+  color: var(--color-navy);
+}
+
+.buybook-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* ── Aside ──────────────────────────────────────────────────────────────────── */
+
+.buybook-aside {
+  position: sticky;
+  top: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buybook-book-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.buybook-book-card__cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+.buybook-book-card__info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.buybook-book-card__title {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--color-navy);
+  margin: 0;
+}
+
+.buybook-book-card__author {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.buybook-book-card__price {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--color-navy);
+  font-size: 1rem;
+  margin: 0.25rem 0 0;
+}
+
+.buybook-book-card__stock {
+  font-size: 0.78rem;
+  color: #16a34a;
+  font-weight: 600;
+  margin: 0;
+}
+
+.buybook-book-card__stock--empty {
+  color: #dc2626;
+}
+
+/* ── Summary card ─────────────────────────────────────────────────────────── */
+
+.buybook-summary {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.buybook-summary__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.buybook-summary__row--total {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-navy);
+}
+
+/* ── Form ─────────────────────────────────────────────────────────────────── */
+
+.buybook-form-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2rem;
+}
+
+.buybook-form-wrap__title {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  color: var(--color-navy);
+  margin: 0 0 1.5rem;
+}
+
+.buybook-stockout {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.buybook-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.buybook-form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.buybook-form__row label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+.buybook-form__row input,
+.buybook-form__row textarea {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  font-family: var(--font-sans);
+  background: var(--color-paper, #faf8f5);
+  transition: border-color var(--transition);
+  resize: vertical;
+}
+
+.buybook-form__row input:focus,
+.buybook-form__row textarea:focus {
+  outline: none;
+  border-color: var(--color-navy);
+}
+
+.buybook-form__row input.input-error,
+.buybook-form__row textarea.input-error {
+  border-color: #dc2626;
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin: 0;
+}
+
+.buybook-form__submit-error {
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.buybook-form__submit {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1rem;
+}
+
+/* ── Success ──────────────────────────────────────────────────────────────── */
+
+.buybook-success {
+  max-width: 560px;
+  margin: 3rem auto;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buybook-success__icon {
+  font-size: 2.5rem;
+}
+
+.buybook-success h2 {
+  font-family: var(--font-serif);
+  color: var(--color-navy);
+  margin: 0;
+}
+
+.buybook-success p {
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.buybook-success__bank {
+  background: var(--color-paper, #faf8f5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.buybook-success__bank-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin: 0;
+}
+
+.buybook-success__bank-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.buybook-success__bank-name {
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.buybook-success__bank-num {
+  font-size: 1.3rem;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--color-navy);
+  letter-spacing: 0.04em;
+}
+
+.buybook-success__bank-holder {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.buybook-success__bank-amount {
+  font-size: 0.9rem;
+  color: var(--color-navy);
+  margin: 0;
+}
+
+.buybook-success__bank-note {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.buybook-success__actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .buybook-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .buybook-aside {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .buybook-book-card {
+    flex-direction: row;
+    max-height: 120px;
+  }
+
+  .buybook-book-card__cover {
+    width: 80px;
+    height: 120px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .buybook-form-wrap {
+    padding: 1.25rem;
+  }
+}

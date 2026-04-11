@@ -54,6 +54,25 @@
   opacity: 0.85;
 }
 
+/* Type badge */
+.my-tx-type-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+.my-tx-type-badge--book_sale {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.my-tx-type-badge--publishing {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
 /* Status badge */
 .my-tx-badge {
   font-size: 0.72rem;

@@ -2,13 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
-import { useCart } from '../../context/CartContext';
 import './Navbar.css';
 
 function Navbar() {
   const { user, logout } = useAuth();
   const { lang, t, toggle } = useLang();
-  const { items: cartItems } = useCart();
   const navigate = useNavigate();
   const isAdmin = user?.role === 'admin';
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -58,14 +56,6 @@ function Navbar() {
             <button className="btn-lang" onClick={toggle} title="Toggle language">
               {lang === 'en' ? '🇮🇩 ID' : '🇬🇧 EN'}
             </button>
-            {!isAdmin && (
-              <Link to="/cart" className="navbar__cart" title="Keranjang">
-                🛒
-                {cartItems.length > 0 && (
-                  <span className="navbar__cart-badge">{cartItems.length}</span>
-                )}
-              </Link>
-            )}
             {user ? (
               <div className="navbar__user-menu" ref={dropdownRef}>
                 <button

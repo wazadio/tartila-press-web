@@ -64,6 +64,9 @@ function MyTransactions() {
               <div key={tx.id} className="my-tx-card">
                 <div className="my-tx-card__header">
                   <span className="my-tx-card__invoice">#{tx.id}</span>
+                  <span className={`my-tx-type-badge my-tx-type-badge--${tx.transaction_type || 'publishing'}`}>
+                    {tx.transaction_type === 'book_sale' ? '📦 Pembelian Buku' : '✏️ Jasa Penerbitan'}
+                  </span>
                   <span className={`my-tx-badge my-tx-badge--${tx.status}`}>
                     {tx.status === 'paid' ? p.statusPaid : p.statusUnpaid}
                   </span>
@@ -74,18 +77,34 @@ function MyTransactions() {
                     <div className="my-tx-card__label">{p.bookTitle}</div>
                     <div className="my-tx-card__value">{tx.book_title}</div>
                   </div>
-                  <div className="my-tx-card__col">
-                    <div className="my-tx-card__label">{p.package}</div>
-                    <div className="my-tx-card__value">{tx.package_name}</div>
-                  </div>
-                  <div className="my-tx-card__col">
-                    <div className="my-tx-card__label">{p.genre}</div>
-                    <div className="my-tx-card__value">{tx.genre}</div>
-                  </div>
-                  {tx.package_type === 'per_chapter' && (
+                  {tx.transaction_type !== 'book_sale' && (
+                    <div className="my-tx-card__col">
+                      <div className="my-tx-card__label">{p.package}</div>
+                      <div className="my-tx-card__value">{tx.package_name}</div>
+                    </div>
+                  )}
+                  {tx.transaction_type !== 'book_sale' && (
+                    <div className="my-tx-card__col">
+                      <div className="my-tx-card__label">{p.genre}</div>
+                      <div className="my-tx-card__value">{tx.genre}</div>
+                    </div>
+                  )}
+                  {tx.transaction_type !== 'book_sale' && tx.package_type === 'per_chapter' && (
                     <div className="my-tx-card__col">
                       <div className="my-tx-card__label">{p.chapters}</div>
                       <div className="my-tx-card__value">{tx.chapters}</div>
+                    </div>
+                  )}
+                  {tx.transaction_type === 'book_sale' && (
+                    <div className="my-tx-card__col">
+                      <div className="my-tx-card__label">Jumlah</div>
+                      <div className="my-tx-card__value">{tx.chapters} eksemplar</div>
+                    </div>
+                  )}
+                  {tx.transaction_type === 'book_sale' && tx.address && (
+                    <div className="my-tx-card__col">
+                      <div className="my-tx-card__label">Alamat Pengiriman</div>
+                      <div className="my-tx-card__value">{tx.address}</div>
                     </div>
                   )}
                   <div className="my-tx-card__col">

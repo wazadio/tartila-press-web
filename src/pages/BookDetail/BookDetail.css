@@ -164,6 +164,16 @@
   color: var(--color-ink);
 }
 
+.book-detail__out-of-stock {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #dc2626;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  background: #fef2f2;
+}
+
 .book-detail__back {
   margin-top: 3rem;
   padding-top: 1.25rem;

@@ -131,3 +131,4 @@ export const transactionsApi = {
   create: (body) => request('/transactions', { method: 'POST', body: JSON.stringify(body) }),
   update: (id, body) => request(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
 };
+
