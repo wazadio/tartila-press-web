@@ -258,10 +258,15 @@ function AdminDashboard() {
     Promise.allSettled([booksApi.list(), authorsApi.list(), packagesApi.list(), genresApi.list(), transactionsApi.list()])
       .then(([b, au, p, g, tx]) => {
         if (b.status === 'fulfilled') setBooks(b.value);
+        else console.error('[admin] books fetch failed:', b.reason);
         if (au.status === 'fulfilled') setAuthors(au.value);
+        else console.error('[admin] authors fetch failed:', au.reason);
         if (p.status === 'fulfilled') setPackages(p.value);
+        else console.error('[admin] packages fetch failed:', p.reason);
         if (g.status === 'fulfilled') setGenres(g.value);
+        else console.error('[admin] genres fetch failed:', g.reason);
         if (tx.status === 'fulfilled') setTransactions(tx.value);
+        else console.error('[admin] transactions fetch failed:', tx.reason);
       })
       .finally(() => setLoading(false));
   }, []);
