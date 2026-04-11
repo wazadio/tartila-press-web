@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { packagesApi, genresApi, transactionsApi, booksApi, bookChaptersApi, bidangApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
@@ -15,6 +15,7 @@ function fmt(price) {
 
 function Payment() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { t, lang } = useLang();
   const p = t.payment;
@@ -75,7 +76,22 @@ function Payment() {
           setBankAccountNumber(configResult.value.bank_account_number || '');
         }
         if (pkgData.type === 'per_chapter') {
-          booksApi.list({ is_template: true }).then(setBookList).catch(() => {});
+          const preBookId = searchParams.get('book');
+          booksApi.list({ is_template: true }).then((books) => {
+            setBookList(books);
+            if (preBookId) {
+              const book = books.find((b) => String(b.id) === String(preBookId));
+              if (book) {
+                setSelectedBookId(String(book.id));
+                setSelectedBook(book);
+                setForm((prev) => ({ ...prev, bookTitle: book.title || '', genre: book.genre || '' }));
+                bookChaptersApi.list(book.id)
+                  .then((chs) => setAvailableChapters(chs))
+                  .catch(() => {});
+                setBookModalOpen(true);
+              }
+            }
+          }).catch(() => {});
         }
         setForm((prev) => ({
           ...prev,
@@ -374,6 +390,9 @@ function Payment() {
                               <div className="book-grid-item__tags">
                                 {b.bidang_name && <span className="book-grid-item__tag book-grid-item__tag--bidang">{b.bidang_name}</span>}
                                 {b.genre && <span className="book-grid-item__tag">{b.genre}</span>}
+                              </div>
+                              <div className="book-grid-item__cta">
+                                {isConfirmed ? 'Dipilih ✓' : 'Pilih Bab →'}
                               </div>
                             </div>
                           </button>

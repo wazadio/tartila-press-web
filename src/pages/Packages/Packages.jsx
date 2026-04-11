@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { packagesApi, booksApi, bookChaptersApi } from '../../services/api';
 import { useLang } from '../../context/LanguageContext';
 import './Packages.css';
@@ -47,6 +47,7 @@ function PackageCard({ pkg, p }) {
 }
 
 function Packages() {
+  const navigate = useNavigate();
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -73,6 +74,13 @@ function Packages() {
       bookChaptersApi.list(book.id)
         .then((chs) => setChaptersMap((prev) => ({ ...prev, [book.id]: chs })))
         .catch(() => setChaptersMap((prev) => ({ ...prev, [book.id]: [] })));
+    }
+  }
+
+  function navigateToPayment(book) {
+    const perChapterPkg = packages.find((pkg) => pkg.type === 'per_chapter');
+    if (perChapterPkg) {
+      navigate(`/payment/${perChapterPkg.id}?book=${book.id}`);
     }
   }
 
@@ -217,7 +225,7 @@ function Packages() {
                         <button
                           type="button"
                           className="pkg-book-card__select-btn"
-                          onClick={() => openBookModal(book)}
+                          onClick={() => navigateToPayment(book)}
                         >
                           Pilih Bab →
                         </button>
