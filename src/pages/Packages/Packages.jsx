@@ -119,46 +119,49 @@ function Packages() {
 
       {/* Packages Tab */}
       {activeTab === 'packages' && (
-          {loading && <p className="packages-loading">{p.loading}</p>}
-          {error && <p className="error-msg">{error}</p>}
-
-          {!loading && !error && (
-            <div className="pkg-grid">
-              {packages.map((pkg) => <PackageCard key={pkg.id} pkg={pkg} p={p} />)}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Comparison */}
-      {!loading && !error && packages.length > 0 && (
-        <section className="packages-compare">
+        <>
+        <section className="packages-cards">
           <div className="container">
-            <h2 className="packages-compare__title">{p.whatsIncluded}</h2>
-            <div className="compare-table-wrapper">
-              <table className="compare-table">
-                <thead>
-                  <tr>
-                    <th>{p.feature}</th>
-                    <th>{p.perChapter}</th>
-                    <th>{p.perBook}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {featureRows.map(([feature, chapter, book]) => (
-                    <tr key={feature}>
-                      <td>{feature}</td>
-                      <td className="compare-table__check">{chapter ? '✓' : '—'}</td>
-                      <td className="compare-table__check">{book ? '✓' : '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {loading && <p className="packages-loading">{p.loading}</p>}
+            {error && <p className="error-msg">{error}</p>}
+
+            {!loading && !error && (
+              <div className="pkg-grid">
+                {packages.map((pkg) => <PackageCard key={pkg.id} pkg={pkg} p={p} />)}
+              </div>
+            )}
           </div>
         </section>
-      )}
-      </>
+
+        {/* Comparison */}
+        {!loading && !error && packages.length > 0 && (
+          <section className="packages-compare">
+            <div className="container">
+              <h2 className="packages-compare__title">{p.whatsIncluded}</h2>
+              <div className="compare-table-wrapper">
+                <table className="compare-table">
+                  <thead>
+                    <tr>
+                      <th>{p.feature}</th>
+                      <th>{p.perChapter}</th>
+                      <th>{p.perBook}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {featureRows.map(([feature, chapter, book]) => (
+                      <tr key={feature}>
+                        <td>{feature}</td>
+                        <td className="compare-table__check">{chapter ? '✓' : '—'}</td>
+                        <td className="compare-table__check">{book ? '✓' : '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )}
+        </>
       )}
 
       {/* Buku & Bab Tab */}
