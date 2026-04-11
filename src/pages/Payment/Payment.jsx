@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { packagesApi, genresApi, transactionsApi, booksApi, bookChaptersApi } from '../../services/api';
+import { packagesApi, genresApi, transactionsApi, booksApi, bookChaptersApi, bidangApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
 import './Payment.css';
@@ -32,7 +32,11 @@ function Payment() {
   const [bankAccountNumber, setBankAccountNumber] = useState('');
 
   const [chapters, setChapters] = useState(1);
+  const [bidangList, setBidangList] = useState([]);
+  const [selectedBidangId, setSelectedBidangId] = useState('');
+  const [selectedGenreFilter, setSelectedGenreFilter] = useState('');
   const [bookList, setBookList] = useState([]);
+  const [filteredBooks, setFilteredBooks] = useState([]);
   const [selectedBookId, setSelectedBookId] = useState('');
   const [availableChapters, setAvailableChapters] = useState([]);
   const [selectedChapterIds, setSelectedChapterIds] = useState([]);
@@ -47,8 +51,8 @@ function Payment() {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    Promise.allSettled([packagesApi.get(id), genresApi.list(), transactionsApi.getConfig()])
-      .then(([pkgResult, genreResult, configResult]) => {
+    Promise.allSettled([packagesApi.get(id), genresApi.list(), transactionsApi.getConfig(), bidangApi.list()])
+      .then(([pkgResult, genreResult, configResult, bidangResult]) => {
         if (pkgResult.status !== 'fulfilled') {
           setNotFound(true);
           return;
@@ -56,8 +60,10 @@ function Payment() {
 
         const pkgData = pkgResult.value;
         const gData = genreResult.status === 'fulfilled' ? genreResult.value : [];
+        const bData = bidangResult.status === 'fulfilled' ? bidangResult.value : [];
         setPkg(pkgData);
         setGenreList(gData);
+        setBidangList(bData);
         if (configResult.status === 'fulfilled') {
           setBankName(configResult.value.bank_name || '');
           setBankAccountName(configResult.value.bank_account_name || '');
@@ -70,7 +76,7 @@ function Payment() {
           ...prev,
           name: user?.name || '',
           email: user?.email || '',
-          genre: gData[0]?.name || '',
+          genre: pkgData.type === 'per_chapter' ? '' : (gData[0]?.name || ''),
         }));
       })
       .finally(() => setLoading(false));
@@ -89,6 +95,27 @@ function Payment() {
   const chapterCount = isPerChapter
     ? (selectedChapterIds.length > 0 ? selectedChapterIds.length : chapters)
     : 1;
+
+  function handleBidangSelect(e) {
+    setSelectedBidangId(e.target.value);
+    setSelectedGenreFilter('');
+    setSelectedBookId('');
+    setAvailableChapters([]);
+    setSelectedChapterIds([]);
+    setForm((prev) => ({ ...prev, bookTitle: '', genre: '' }));
+    setFilteredBooks([]);
+  }
+
+  function handleGenreFilterSelect(e) {
+    const genreName = e.target.value;
+    setSelectedGenreFilter(genreName);
+    setSelectedBookId('');
+    setAvailableChapters([]);
+    setSelectedChapterIds([]);
+    setForm((prev) => ({ ...prev, bookTitle: '', genre: genreName }));
+    const filtered = bookList.filter((b) => b.genre === genreName);
+    setFilteredBooks(filtered);
+  }
 
   function handleBookSelect(e) {
     const bookId = e.target.value;
@@ -119,15 +146,21 @@ function Payment() {
 
   function validate() {
     const errs = {};
-    if (!form.bookTitle.trim()) errs.bookTitle = p.bookTitleRequired;
-    if (!form.genre) errs.genre = p.genreRequired;
+    if (isPerChapter) {
+      if (!selectedBidangId) errs.bidang = 'Pilih bidang terlebih dahulu.';
+      else if (!selectedGenreFilter) errs.genre = 'Pilih genre terlebih dahulu.';
+      else if (!selectedBookId) errs.bookTitle = 'Pilih buku terlebih dahulu.';
+      else if (availableChapters.length > 0 && selectedChapterIds.length === 0)
+        errs.chapters = 'Pilih minimal satu bab.';
+      else if (availableChapters.length === 0 && chapters < 1) errs.chapters = p.chaptersRequired;
+    } else {
+      if (!form.bookTitle.trim()) errs.bookTitle = p.bookTitleRequired;
+      if (!form.genre) errs.genre = p.genreRequired;
+    }
     if (!form.name.trim()) errs.name = p.nameRequired;
     if (!form.email.trim()) errs.email = p.emailRequired;
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = p.emailInvalid;
     if (!form.phone.trim()) errs.phone = p.phoneRequired;
-    if (isPerChapter && availableChapters.length > 0 && selectedChapterIds.length === 0)
-      errs.chapters = 'Please select at least one chapter.';
-    if (isPerChapter && availableChapters.length === 0 && chapters < 1) errs.chapters = p.chaptersRequired;
     return errs;
   }
 
@@ -248,66 +281,92 @@ function Payment() {
             <h1 className="payment-title">{p.title}</h1>
 
             <form className="payment-form" onSubmit={handleSubmit} noValidate>
-              {/* Chapter selector — only for per_chapter */}
               {isPerChapter && (
                 <div className="payment-section">
                   <h2 className="payment-section__title">{p.chapterSelection}</h2>
 
-                  {/* Book selector */}
-                  {bookList.length > 0 && (
+                  {/* Step 1: Bidang */}
+                  <div className="form-group">
+                    <label>Bidang *</label>
+                    <select value={selectedBidangId} onChange={handleBidangSelect}>
+                      <option value="">— Pilih Bidang —</option>
+                      {bidangList.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Step 2: Genre (filtered by bidang) */}
+                  {selectedBidangId && (
                     <div className="form-group">
-                      <label>Select Book</label>
+                      <label>{p.genre} *</label>
+                      <select value={selectedGenreFilter} onChange={handleGenreFilterSelect}>
+                        <option value="">— Pilih Genre —</option>
+                        {genreList
+                          .filter((g) => String(g.bidang_id) === String(selectedBidangId))
+                          .map((g) => (
+                            <option key={g.id} value={g.name}>{genreLabel(g, lang)}</option>
+                          ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Step 3: Book (filtered by genre) */}
+                  {selectedGenreFilter && (
+                    <div className="form-group">
+                      <label>Buku *</label>
                       <select value={selectedBookId} onChange={handleBookSelect}>
-                        <option value="">— pick a book —</option>
-                        {bookList.map((b) => (
+                        <option value="">— Pilih Buku —</option>
+                        {filteredBooks.map((b) => (
                           <option key={b.id} value={b.id}>{b.title}</option>
                         ))}
                       </select>
                     </div>
                   )}
 
-                  {/* Sellable chapters checklist */}
-                  {availableChapters.length > 0 ? (
-                    <div className="form-group">
-                      <label>Select Chapters</label>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.4rem' }}>
-                        {availableChapters.map((ch) => (
-                          <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
-                            <input
-                              type="checkbox"
-                              checked={selectedChapterIds.includes(ch.id)}
-                              onChange={() => toggleChapter(ch.id)}
-                            />
-                            <span>Ch.{ch.number} — {ch.title}</span>
-                            {ch.price > 0 && <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>{fmt(ch.price)}</span>}
-                          </label>
-                        ))}
+                  {/* Step 4: Chapters */}
+                  {selectedBookId && (
+                    availableChapters.length > 0 ? (
+                      <div className="form-group">
+                        <label>Pilih Bab</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.4rem' }}>
+                          {availableChapters.map((ch) => (
+                            <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
+                              <input
+                                type="checkbox"
+                                checked={selectedChapterIds.includes(ch.id)}
+                                onChange={() => toggleChapter(ch.id)}
+                              />
+                              <span>Bab {ch.number} — {ch.title}</span>
+                              {ch.price > 0 && <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>{fmt(ch.price)}</span>}
+                            </label>
+                          ))}
+                        </div>
+                        {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
+                        {selectedChapterIds.length > 0 && (
+                          <p className="chapter-hint" style={{ marginTop: '0.5rem' }}>
+                            {selectedChapterIds.length} bab dipilih · Total: <strong>{fmt(total)}</strong>
+                          </p>
+                        )}
                       </div>
-                      {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
-                      {selectedChapterIds.length > 0 && (
-                        <p className="chapter-hint" style={{ marginTop: '0.5rem' }}>
-                          {selectedChapterIds.length} chapter(s) selected · Total: <strong>{fmt(total)}</strong>
+                    ) : (
+                      <>
+                        <div className="chapter-selector">
+                          <button type="button" className="chapter-btn" onClick={() => setChapters((c) => Math.max(1, c - 1))}>−</button>
+                          <input
+                            type="number" min="1" value={chapters}
+                            onChange={(e) => setChapters(Math.max(1, parseInt(e.target.value) || 1))}
+                            className="chapter-input"
+                          />
+                          <button type="button" className="chapter-btn" onClick={() => setChapters((c) => c + 1)}>+</button>
+                          <span className="chapter-label">{p.chaptersUnit}</span>
+                        </div>
+                        {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
+                        <p className="chapter-hint">
+                          {chapters} {p.chaptersUnit} × {fmt(unitPrice)} = <strong>{fmt(total)}</strong>
                         </p>
-                      )}
-                    </div>
-                  ) : (
-                    /* Fallback: manual chapter count if no sellable chapters defined */
-                    <>
-                      <div className="chapter-selector">
-                        <button type="button" className="chapter-btn" onClick={() => setChapters((c) => Math.max(1, c - 1))}>−</button>
-                        <input
-                          type="number" min="1" value={chapters}
-                          onChange={(e) => setChapters(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="chapter-input"
-                        />
-                        <button type="button" className="chapter-btn" onClick={() => setChapters((c) => c + 1)}>+</button>
-                        <span className="chapter-label">{p.chaptersUnit}</span>
-                      </div>
-                      {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
-                      <p className="chapter-hint">
-                        {chapters} {p.chaptersUnit} × {fmt(unitPrice)} = <strong>{fmt(total)}</strong>
-                      </p>
-                    </>
+                      </>
+                    )
                   )}
                 </div>
               )}
@@ -315,28 +374,51 @@ function Payment() {
               {/* Book info */}
               <div className="payment-section">
                 <h2 className="payment-section__title">{p.bookInfo}</h2>
-                <div className="form-group">
-                  <label>{p.bookTitle} *</label>
-                  <input
-                    name="bookTitle" type="text" value={form.bookTitle}
-                    onChange={handleChange} placeholder={p.bookTitlePlaceholder}
-                    className={errors.bookTitle ? 'input-error' : ''}
-                  />
-                  {errors.bookTitle && <span className="error-msg">{errors.bookTitle}</span>}
-                </div>
-                <div className="form-group">
-                  <label>{p.genre} *</label>
-                  <select
-                    name="genre" value={form.genre} onChange={handleChange}
-                    className={errors.genre ? 'input-error' : ''}
-                  >
-                    <option value="">{p.genrePlaceholder}</option>
-                    {genreList.map((g) => (
-                      <option key={g.id} value={g.name}>{genreLabel(g, lang)}</option>
-                    ))}
-                  </select>
-                  {errors.genre && <span className="error-msg">{errors.genre}</span>}
-                </div>
+                {isPerChapter ? (
+                  /* For per-chapter: display read-only summary of selections */
+                  <>
+                    {form.bookTitle && (
+                      <div className="form-group">
+                        <label>{p.bookTitle}</label>
+                        <input type="text" value={form.bookTitle} readOnly style={{ background: 'var(--color-bg-subtle, #f5f5f5)', cursor: 'default' }} />
+                      </div>
+                    )}
+                    {form.genre && (
+                      <div className="form-group">
+                        <label>{p.genre}</label>
+                        <input type="text" value={form.genre} readOnly style={{ background: 'var(--color-bg-subtle, #f5f5f5)', cursor: 'default' }} />
+                      </div>
+                    )}
+                    {errors.bidang && <p className="error-msg">{errors.bidang}</p>}
+                    {errors.bookTitle && <p className="error-msg">{errors.bookTitle}</p>}
+                    {errors.genre && <p className="error-msg">{errors.genre}</p>}
+                  </>
+                ) : (
+                  <>
+                    <div className="form-group">
+                      <label>{p.bookTitle} *</label>
+                      <input
+                        name="bookTitle" type="text" value={form.bookTitle}
+                        onChange={handleChange} placeholder={p.bookTitlePlaceholder}
+                        className={errors.bookTitle ? 'input-error' : ''}
+                      />
+                      {errors.bookTitle && <span className="error-msg">{errors.bookTitle}</span>}
+                    </div>
+                    <div className="form-group">
+                      <label>{p.genre} *</label>
+                      <select
+                        name="genre" value={form.genre} onChange={handleChange}
+                        className={errors.genre ? 'input-error' : ''}
+                      >
+                        <option value="">{p.genrePlaceholder}</option>
+                        {genreList.map((g) => (
+                          <option key={g.id} value={g.name}>{genreLabel(g, lang)}</option>
+                        ))}
+                      </select>
+                      {errors.genre && <span className="error-msg">{errors.genre}</span>}
+                    </div>
+                  </>
+                )}
                 <div className="form-group">
                   <label>{p.notes}</label>
                   <textarea
