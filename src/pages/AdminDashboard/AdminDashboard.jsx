@@ -575,6 +575,7 @@ function AdminDashboard() {
                       <th>{a.colPrice}</th>
                       <th>{a.colFeatured}</th>
                       <th>Template</th>
+                      <th>Stok</th>
                       <th>{a.colActions}</th>
                     </tr>
                   </thead>
@@ -599,6 +600,9 @@ function AdminDashboard() {
                           <span className={`status-dot ${book.is_template ? 'status-dot--yes' : 'status-dot--no'}`}>
                             {book.is_template ? a.yes : a.no}
                           </span>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          {book.stock != null ? book.stock : <span style={{ color: 'var(--color-text-muted)' }}>∞</span>}
                         </td>
                         <td>
                           <div className="admin-actions">
