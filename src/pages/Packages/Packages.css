@@ -409,6 +409,25 @@
   margin: 0;
 }
 
+.pkg-book-card__select-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.55rem 1rem;
+  background: var(--color-navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.pkg-book-card__select-btn:hover {
+  background: var(--color-brass);
+}
+
 .pkg-book-card__chapters {
   padding: 0.75rem 1rem 1rem;
   border-top: 1px solid var(--color-border);

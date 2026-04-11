@@ -214,6 +214,13 @@ function Packages() {
                         {book.author && (
                           <p className="pkg-book-card__author">{book.author}</p>
                         )}
+                        <button
+                          type="button"
+                          className="pkg-book-card__select-btn"
+                          onClick={() => openBookModal(book)}
+                        >
+                          Pilih Bab →
+                        </button>
                       </div>
                     </div>
                   ))}
