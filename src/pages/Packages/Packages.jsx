@@ -52,7 +52,7 @@ function Packages() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('packages');
   const [templateBooks, setTemplateBooks] = useState([]);
-  const [expandedBookId, setExpandedBookId] = useState(null);
+  const [modalBook, setModalBook] = useState(null);
   const [chaptersMap, setChaptersMap] = useState({});
   const { t } = useLang();
   const p = t.packages;
@@ -67,13 +67,17 @@ function Packages() {
       .catch(() => {});
   }, []);
 
-  function toggleBook(bookId) {
-    setExpandedBookId((prev) => (prev === bookId ? null : bookId));
-    if (!chaptersMap[bookId]) {
-      bookChaptersApi.list(bookId)
-        .then((chs) => setChaptersMap((prev) => ({ ...prev, [bookId]: chs })))
-        .catch(() => setChaptersMap((prev) => ({ ...prev, [bookId]: [] })));
+  function openBookModal(book) {
+    setModalBook(book);
+    if (!chaptersMap[book.id]) {
+      bookChaptersApi.list(book.id)
+        .then((chs) => setChaptersMap((prev) => ({ ...prev, [book.id]: chs })))
+        .catch(() => setChaptersMap((prev) => ({ ...prev, [book.id]: [] })));
     }
+  }
+
+  function closeBookModal() {
+    setModalBook(null);
   }
 
 
@@ -184,74 +188,102 @@ function Packages() {
                   Menampilkan <strong>{templateBooks.length}</strong> buku
                 </p>
                 <div className="books-grid">
-                  {templateBooks.map((book) => {
-                    const isOpen = expandedBookId === book.id;
-                    const chapters = chaptersMap[book.id];
-                    return (
-                      <div key={book.id} className={`pkg-book-card${isOpen ? ' pkg-book-card--open' : ''}`}>
-                        <button
-                          type="button"
-                          className="pkg-book-card__cover-btn"
-                          onClick={() => toggleBook(book.id)}
-                          aria-expanded={isOpen}
-                        >
-                          <img
-                            src={book.cover || `https://placehold.co/300x420?text=${encodeURIComponent(book.title)}`}
-                            alt={book.title}
-                            className="pkg-book-card__cover"
-                            onError={(e) => { e.target.src = `https://placehold.co/300x420?text=${encodeURIComponent(book.title)}`; }}
-                          />
-                          <div className="pkg-book-card__cover-overlay">
-                            <span>{isOpen ? '▲ Tutup' : '▼ Lihat Bab'}</span>
-                          </div>
-                        </button>
-                        <div className="pkg-book-card__body">
-                          {book.genre && <span className="badge">{book.genre}</span>}
-                          <h3 className="pkg-book-card__title">{book.title}</h3>
-                          {book.bidang_name && (
-                            <p className="pkg-book-card__author">{book.bidang_name}</p>
-                          )}
-                          {book.author && (
-                            <p className="pkg-book-card__author">{book.author}</p>
-                          )}
+                  {templateBooks.map((book) => (
+                    <div key={book.id} className="pkg-book-card">
+                      <button
+                        type="button"
+                        className="pkg-book-card__cover-btn"
+                        onClick={() => openBookModal(book)}
+                      >
+                        <img
+                          src={book.cover || `https://placehold.co/300x420?text=${encodeURIComponent(book.title)}`}
+                          alt={book.title}
+                          className="pkg-book-card__cover"
+                          onError={(e) => { e.target.src = `https://placehold.co/300x420?text=${encodeURIComponent(book.title)}`; }}
+                        />
+                        <div className="pkg-book-card__cover-overlay">
+                          <span>Lihat Bab</span>
                         </div>
-                        {isOpen && (
-                          <div className="pkg-book-card__chapters">
-                            {!chapters ? (
-                              <p className="pkg-book-card__loading">Memuat bab…</p>
-                            ) : chapters.length === 0 ? (
-                              <p className="pkg-book-card__empty">Belum ada bab.</p>
-                            ) : (
-                              <table className="template-chapters-table">
-                                <thead>
-                                  <tr>
-                                    <th>No.</th>
-                                    <th>Judul Bab</th>
-                                    <th>Harga</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {chapters.map((ch) => (
-                                    <tr key={ch.id}>
-                                      <td>{ch.number}</td>
-                                      <td>{ch.title}</td>
-                                      <td>{ch.price > 0 ? fmt(ch.price) : '—'}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            )}
-                          </div>
+                      </button>
+                      <div className="pkg-book-card__body">
+                        {book.genre && <span className="badge">{book.genre}</span>}
+                        <h3 className="pkg-book-card__title">{book.title}</h3>
+                        {book.bidang_name && (
+                          <p className="pkg-book-card__author">{book.bidang_name}</p>
+                        )}
+                        {book.author && (
+                          <p className="pkg-book-card__author">{book.author}</p>
                         )}
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               </>
             )}
           </div>
         </section>
       )}
+
+      {/* Chapter Modal */}
+      {modalBook && (() => {
+        const chapters = chaptersMap[modalBook.id];
+        return (
+          <>
+            <div className="pkgmodal__backdrop" onClick={closeBookModal} />
+            <div className="pkgmodal" role="dialog" aria-modal="true">
+              {modalBook.cover && (
+                <div className="pkgmodal__hero">
+                  <img src={modalBook.cover} alt={modalBook.title} className="pkgmodal__hero-img" />
+                  <div className="pkgmodal__hero-overlay">
+                    <div className="book-preview__tags">
+                      {modalBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{modalBook.bidang_name}</span>}
+                      {modalBook.genre && <span className="book-preview__tag">{modalBook.genre}</span>}
+                    </div>
+                    <h2 className="pkgmodal__hero-title">{modalBook.title}</h2>
+                    {modalBook.author && <p className="pkgmodal__hero-author">{modalBook.author}</p>}
+                  </div>
+                  <button type="button" className="pkgmodal__close" onClick={closeBookModal}>×</button>
+                </div>
+              )}
+              {!modalBook.cover && (
+                <div className="pkgmodal__header">
+                  <div>
+                    <span className="pkgmodal__label">Daftar Bab</span>
+                    <h2 className="pkgmodal__title">{modalBook.title}</h2>
+                  </div>
+                  <button type="button" className="pkgmodal__close pkgmodal__close--flat" onClick={closeBookModal}>×</button>
+                </div>
+              )}
+              <div className="pkgmodal__body">
+                {!chapters ? (
+                  <p className="pkgmodal__loading">Memuat bab…</p>
+                ) : chapters.length === 0 ? (
+                  <p className="pkgmodal__empty">Belum ada bab yang ditentukan.</p>
+                ) : (
+                  <table className="pkgmodal__table">
+                    <thead>
+                      <tr>
+                        <th>No.</th>
+                        <th>Judul Bab</th>
+                        <th>Harga</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {chapters.map((ch) => (
+                        <tr key={ch.id}>
+                          <td className="pkgmodal__table-num">{ch.number}</td>
+                          <td>{ch.title}</td>
+                          <td className="pkgmodal__table-price">{ch.price > 0 ? fmt(ch.price) : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          </>
+        );
+      })()}
 
       {/* CTA */}
       <section className="packages-cta">
