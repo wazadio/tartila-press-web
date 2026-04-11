@@ -894,7 +894,7 @@ function BookEditor() {
             <small className="form-hint">Paste a URL or upload an image (JPEG, PNG, WebP, GIF · max 5 MB).</small>
           </div>
 
-          {!form.is_template && (<>
+          {!form.is_template && (
           <div className="chapters-section">
             <div className="chapters-section__header">
               <label>Book Chapters <span style={{color:'var(--color-text-muted)',fontWeight:400,fontSize:'0.85rem'}}>(optional)</span></label>
@@ -1017,7 +1017,9 @@ function BookEditor() {
               })}
             </div>
           </div>
+          )}
 
+          {form.is_template && (
           <div className="chapters-section" style={{ marginTop: '2rem' }}>
             <div className="chapters-section__header">
               <label>Chapters for Sale</label>
@@ -1091,7 +1093,7 @@ function BookEditor() {
               </div>
             )}
           </div>
-          </>)}
+          )}
 
           <div className="form-group form-group--checkbox">
             <input id="featured" name="featured" type="checkbox" checked={form.featured} onChange={handleChange} />
