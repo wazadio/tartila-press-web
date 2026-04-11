@@ -44,6 +44,7 @@ function Payment() {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [bookModalOpen, setBookModalOpen] = useState(false);
   const [bookConfirmed, setBookConfirmed] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
   const [form, setForm] = useState({
     bookTitle: '',
     genre: '',
@@ -358,7 +359,12 @@ function Payment() {
                           >
                             <div className="book-grid-item__cover-wrap">
                               {b.cover
-                                ? <img src={b.cover} alt={b.title} className="book-grid-item__cover" />
+                                ? <img
+                                    src={b.cover} alt={b.title}
+                                    className="book-grid-item__cover"
+                                    onClick={(e) => { e.stopPropagation(); setLightboxSrc(b.cover); }}
+                                    title="Klik untuk memperbesar"
+                                  />
                                 : <div className="book-grid-item__cover-placeholder">📖</div>
                               }
                               {isConfirmed && <div className="book-grid-item__check">✓</div>}
@@ -564,33 +570,54 @@ function Payment() {
         <>
           <div className="book-modal__backdrop" onClick={() => setBookModalOpen(false)} />
           <div className="book-modal" role="dialog" aria-modal="true">
-            <div className="book-modal__header">
-              <span className="book-modal__title">Detail Template</span>
-              <button type="button" className="book-modal__close" onClick={() => setBookModalOpen(false)}>×</button>
-            </div>
-            <div className="book-modal__body">
-              <div className="book-modal__preview">
-                {selectedBook.cover && (
-                  <img src={selectedBook.cover} alt={selectedBook.title} className="book-modal__cover" />
-                )}
-                <div className="book-modal__meta">
-                  <h2 className="book-modal__book-title">{selectedBook.title}</h2>
-                  <div className="book-preview__tags" style={{ marginBottom: '0.75rem' }}>
-                    {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
-                    {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
-                  </div>
-                  {(selectedBook.synopsis || selectedBook.description) && (
-                    <p className="book-preview__desc">
-                      {selectedBook.synopsis || selectedBook.description}
-                    </p>
-                  )}
-                </div>
-              </div>
 
+            {/* Hero cover strip */}
+            {selectedBook.cover && (
+              <div className="book-modal__hero">
+                <img
+                  src={selectedBook.cover}
+                  alt={selectedBook.title}
+                  className="book-modal__hero-img book-modal__cover--clickable"
+                  onClick={() => setLightboxSrc(selectedBook.cover)}
+                  title="Klik untuk memperbesar"
+                />
+                <div className="book-modal__hero-overlay">
+                  <div className="book-preview__tags">
+                    {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
+                    {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
+                  </div>
+                  <h2 className="book-modal__hero-title">{selectedBook.title}</h2>
+                </div>
+                <button type="button" className="book-modal__close" onClick={() => setBookModalOpen(false)}>×</button>
+              </div>
+            )}
+
+            {/* Fallback header if no cover */}
+            {!selectedBook.cover && (
+              <div className="book-modal__header">
+                <div>
+                  <span className="book-modal__title">Detail Template</span>
+                  <h2 className="book-modal__header-book-title">{selectedBook.title}</h2>
+                </div>
+                <button type="button" className="book-modal__close" onClick={() => setBookModalOpen(false)}>×</button>
+              </div>
+            )}
+
+            <div className="book-modal__body">
+              {/* Synopsis */}
+              {(selectedBook.synopsis || selectedBook.description) && (
+                <div className="book-modal__synopsis">
+                  <p className="book-modal__synopsis-text">
+                    {selectedBook.synopsis || selectedBook.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Chapters */}
               <div className="book-modal__chapters">
                 {availableChapters.length > 0 ? (
                   <>
-                    <h3 className="book-modal__section-title">Pilih Bab</h3>
+                    <h3 className="book-modal__section-title">Pilih Bab yang Ingin Dipesan</h3>
                     <div className="chapter-checklist">
                       {availableChapters.map((ch) => (
                         <label key={ch.id} className={`chapter-checklist__item${selectedChapterIds.includes(ch.id) ? ' chapter-checklist__item--checked' : ''}`}>
@@ -606,6 +633,11 @@ function Payment() {
                       ))}
                     </div>
                     {errors.chapters && <p className="error-msg" style={{ marginTop: '0.5rem' }}>{errors.chapters}</p>}
+                    {selectedChapterIds.length > 0 && (
+                      <p className="chapter-hint" style={{ marginTop: '0.5rem' }}>
+                        {selectedChapterIds.length} bab dipilih
+                      </p>
+                    )}
                   </>
                 ) : (
                   <>
@@ -715,6 +747,20 @@ function Payment() {
             </div>
           </div>
         </>
+      )}
+
+      {/* ── Lightbox ── */}
+      {lightboxSrc && (
+        <div
+          className="lightbox"
+          onClick={() => setLightboxSrc(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Lihat gambar"
+        >
+          <button type="button" className="lightbox__close" onClick={() => setLightboxSrc(null)}>×</button>
+          <img src={lightboxSrc} alt="" className="lightbox__img" onClick={(e) => e.stopPropagation()} />
+        </div>
       )}
     </div>
   );
