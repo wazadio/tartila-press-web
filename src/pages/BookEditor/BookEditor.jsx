@@ -424,6 +424,7 @@ function BookEditor() {
   const [isExporting, setIsExporting] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [coverUploadError, setCoverUploadError] = useState('');
+  const [useRichEditor, setUseRichEditor] = useState(true);
 
   useEffect(() => {
     const fetches = [authorsApi.list(), genresApi.list()];
@@ -953,16 +954,37 @@ function BookEditor() {
                       {chapterError.title && <span className="error-msg">{chapterError.title}</span>}
                     </div>
 
-                    <div className={`rich-editor${chapterError.content ? ' input-error' : ''}`}>
-                      <ReactQuill
-                        theme="snow"
-                        value={chapter.content}
-                        onChange={(value) => handleChapterContentChange(chapter.id, value)}
-                        modules={editorModules}
-                        formats={editorFormats}
-                        placeholder={`Write content for Chapter ${chapterIndex + 1}...`}
-                      />
+                    <div className="form-group__editor-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                      <label>Content *</label>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setUseRichEditor((v) => !v)}
+                      >
+                        {useRichEditor ? 'Switch to Plain Text' : 'Switch to Rich Editor'}
+                      </button>
                     </div>
+                    {useRichEditor ? (
+                      <div className={`rich-editor${chapterError.content ? ' input-error' : ''}`}>
+                        <ReactQuill
+                          theme="snow"
+                          value={chapter.content}
+                          onChange={(value) => handleChapterContentChange(chapter.id, value)}
+                          modules={editorModules}
+                          formats={editorFormats}
+                          placeholder={`Write content for Chapter ${chapterIndex + 1}...`}
+                        />
+                      </div>
+                    ) : (
+                      <textarea
+                        className={chapterError.content ? 'input-error' : ''}
+                        value={getPlainTextFromHtml(chapter.content)}
+                        onChange={(e) => handleChapterContentChange(chapter.id, e.target.value)}
+                        rows={12}
+                        placeholder={`Write content for Chapter ${chapterIndex + 1}...`}
+                        style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit', fontSize: '0.95rem', padding: '0.5rem', boxSizing: 'border-box' }}
+                      />
+                    )}
                     {chapterError.content && <span className="error-msg">{chapterError.content}</span>}
                   </div>
                 );
