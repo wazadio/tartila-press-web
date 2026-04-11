@@ -813,6 +813,8 @@ function BookEditor() {
               {errors.genre && <span className="error-msg">{errors.genre}</span>}
             </div>
           </div>
+
+          <div className="form-row">
             <div className="form-group">
               <label htmlFor="publishedYear">Published Year *</label>
               <input id="publishedYear" name="publishedYear" type="number" min="1900" max="2100" value={form.publishedYear} onChange={handleChange} className={errors.publishedYear ? 'input-error' : ''} />
