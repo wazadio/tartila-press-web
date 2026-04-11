@@ -857,6 +857,9 @@ function BookEditor() {
               placeholder="Ringkasan atau blurb buku yang ditampilkan di halaman payment dan katalog…"
             />
           </div>
+
+          <div className="form-group">
+            <label>Cover Image</label>
             <div className="cover-upload-row">
               <input
                 id="cover"
