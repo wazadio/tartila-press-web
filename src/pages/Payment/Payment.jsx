@@ -273,23 +273,25 @@ function Payment() {
 
   return (
     <div className="payment-page">
-      <div className="container">
+      <div className="payment-container">
         <div className="payment-breadcrumb">
           <Link to="/packages">{p.packages}</Link>
           <span>/</span>
           <span>{p.checkout}</span>
         </div>
+        <h1 className="payment-title">{p.title}</h1>
 
-        <div className="payment-layout">
-          {/* Form */}
-          <div className="payment-form-wrap">
-            <h1 className="payment-title">{p.title}</h1>
+        <form className="payment-layout" onSubmit={handleSubmit} noValidate>
 
-            <form className="payment-form" onSubmit={handleSubmit} noValidate>
-              {isPerChapter && (
-                <div className="payment-section">
-                  <h2 className="payment-section__title">{p.chapterSelection}</h2>
+          {/* ── LEFT: Selection ── */}
+          <div className="payment-col payment-col--left">
+            <div className="payment-section">
+              <h2 className="payment-section__title">
+                {isPerChapter ? p.chapterSelection : p.bookInfo}
+              </h2>
 
+              {isPerChapter ? (
+                <>
                   {/* Step 1: Bidang */}
                   <div className="form-group">
                     <label>Bidang *</label>
@@ -299,9 +301,10 @@ function Payment() {
                         <option key={b.id} value={b.id}>{b.name}</option>
                       ))}
                     </select>
+                    {errors.bidang && <p className="error-msg">{errors.bidang}</p>}
                   </div>
 
-                  {/* Step 2: Genre (filtered by bidang, fallback to all) */}
+                  {/* Step 2: Genre */}
                   {selectedBidangId && (() => {
                     const linked = genreList.filter((g) => String(g.bidang_id) === String(selectedBidangId));
                     const options = linked.length > 0 ? linked : genreList;
@@ -314,11 +317,12 @@ function Payment() {
                             <option key={g.id} value={g.name}>{genreLabel(g, lang)}</option>
                           ))}
                         </select>
+                        {errors.genre && <p className="error-msg">{errors.genre}</p>}
                       </div>
                     );
                   })()}
 
-                  {/* Step 3: Book (filtered by genre) */}
+                  {/* Step 3: Book */}
                   {selectedGenreFilter && (
                     <div className="form-group">
                       <label>Buku *</label>
@@ -328,177 +332,177 @@ function Payment() {
                           <option key={b.id} value={b.id}>{b.title}</option>
                         ))}
                       </select>
+                      {errors.bookTitle && <p className="error-msg">{errors.bookTitle}</p>}
                     </div>
                   )}
 
-                  {/* Book preview */}
-                  {selectedBook && (
-                    <div className="book-preview">
-                      {selectedBook.cover && (
-                        <img src={selectedBook.cover} alt={selectedBook.title} className="book-preview__cover" />
-                      )}
-                      <div className="book-preview__body">
-                        <div className="book-preview__title">{selectedBook.title}</div>
-                        <div className="book-preview__tags">
-                          {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
-                          {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
-                        </div>
-                        {(selectedBook.synopsis || selectedBook.description) && (
-                          <p className="book-preview__desc">
-                            {(() => {
-                              const text = selectedBook.synopsis || selectedBook.description;
-                              return text.length > 300 ? text.slice(0, 300) + '…' : text;
-                            })()}
-                          </p>
-                        )}
-                      </div>
+                  {form.bookTitle && (
+                    <div className="form-group">
+                      <label>{p.bookTitle}</label>
+                      <input type="text" value={form.bookTitle} readOnly className="input-readonly" />
                     </div>
                   )}
-
-                  {/* Step 4: Chapters */}
-                  {selectedBookId && (
-                    availableChapters.length > 0 ? (
-                      <div className="form-group">
-                        <label>Pilih Bab</label>
-                        <div className="chapter-checklist">
-                          {availableChapters.map((ch) => (
-                            <label key={ch.id} className={`chapter-checklist__item${selectedChapterIds.includes(ch.id) ? ' chapter-checklist__item--checked' : ''}`}>
-                              <input
-                                type="checkbox"
-                                checked={selectedChapterIds.includes(ch.id)}
-                                onChange={() => toggleChapter(ch.id)}
-                              />
-                              <span className="chapter-checklist__num">Bab {ch.number}</span>
-                              <span className="chapter-checklist__title">{ch.title}</span>
-                              {ch.price > 0 && <span className="chapter-checklist__price">{fmt(ch.price)}</span>}
-                            </label>
-                          ))}
-                        </div>
-                        {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
-                        {selectedChapterIds.length > 0 && (
-                          <p className="chapter-hint" style={{ marginTop: '0.5rem' }}>
-                            {selectedChapterIds.length} bab dipilih · Total: <strong>{fmt(total)}</strong>
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <>
-                        <div className="chapter-selector">
-                          <button type="button" className="chapter-btn" onClick={() => setChapters((c) => Math.max(1, c - 1))}>−</button>
-                          <input
-                            type="number" min="1" value={chapters}
-                            onChange={(e) => setChapters(Math.max(1, parseInt(e.target.value) || 1))}
-                            className="chapter-input"
-                          />
-                          <button type="button" className="chapter-btn" onClick={() => setChapters((c) => c + 1)}>+</button>
-                          <span className="chapter-label">{p.chaptersUnit}</span>
-                        </div>
-                        {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
-                        <p className="chapter-hint">
-                          {chapters} {p.chaptersUnit} × {fmt(unitPrice)} = <strong>{fmt(total)}</strong>
-                        </p>
-                      </>
-                    )
+                  {form.genre && (
+                    <div className="form-group">
+                      <label>{p.genre}</label>
+                      <input type="text" value={form.genre} readOnly className="input-readonly" />
+                    </div>
                   )}
-                </div>
+                </>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label>{p.bookTitle} *</label>
+                    <input
+                      name="bookTitle" type="text" value={form.bookTitle}
+                      onChange={handleChange} placeholder={p.bookTitlePlaceholder}
+                      className={errors.bookTitle ? 'input-error' : ''}
+                    />
+                    {errors.bookTitle && <span className="error-msg">{errors.bookTitle}</span>}
+                  </div>
+                  <div className="form-group">
+                    <label>{p.genre} *</label>
+                    <select
+                      name="genre" value={form.genre} onChange={handleChange}
+                      className={errors.genre ? 'input-error' : ''}
+                    >
+                      <option value="">{p.genrePlaceholder}</option>
+                      {genreList.map((g) => (
+                        <option key={g.id} value={g.name}>{genreLabel(g, lang)}</option>
+                      ))}
+                    </select>
+                    {errors.genre && <span className="error-msg">{errors.genre}</span>}
+                  </div>
+                  <div className="form-group">
+                    <label>{p.notes}</label>
+                    <textarea
+                      name="notes" rows={3} value={form.notes}
+                      onChange={handleChange} placeholder={p.notesPlaceholder}
+                    />
+                  </div>
+                </>
               )}
+            </div>
+          </div>
 
-              {/* Book info */}
-              <div className="payment-section">
-                <h2 className="payment-section__title">{p.bookInfo}</h2>
-                {isPerChapter ? (
-                  /* For per-chapter: display read-only summary of selections */
-                  <>
-                    {form.bookTitle && (
-                      <div className="form-group">
-                        <label>{p.bookTitle}</label>
-                        <input type="text" value={form.bookTitle} readOnly style={{ background: 'var(--color-bg-subtle, #f5f5f5)', cursor: 'default' }} />
-                      </div>
+          {/* ── MIDDLE: Preview + Chapters ── */}
+          <div className="payment-col payment-col--mid">
+            {isPerChapter ? (
+              selectedBook ? (
+                <>
+                  <div className="book-preview">
+                    {selectedBook.cover && (
+                      <img src={selectedBook.cover} alt={selectedBook.title} className="book-preview__cover" />
                     )}
-                    {form.genre && (
-                      <div className="form-group">
-                        <label>{p.genre}</label>
-                        <input type="text" value={form.genre} readOnly style={{ background: 'var(--color-bg-subtle, #f5f5f5)', cursor: 'default' }} />
+                    <div className="book-preview__body">
+                      <div className="book-preview__title">{selectedBook.title}</div>
+                      <div className="book-preview__tags">
+                        {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
+                        {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
                       </div>
-                    )}
-                    {errors.bidang && <p className="error-msg">{errors.bidang}</p>}
-                    {errors.bookTitle && <p className="error-msg">{errors.bookTitle}</p>}
-                    {errors.genre && <p className="error-msg">{errors.genre}</p>}
-                  </>
-                ) : (
-                  <>
-                    <div className="form-group">
-                      <label>{p.bookTitle} *</label>
-                      <input
-                        name="bookTitle" type="text" value={form.bookTitle}
-                        onChange={handleChange} placeholder={p.bookTitlePlaceholder}
-                        className={errors.bookTitle ? 'input-error' : ''}
-                      />
-                      {errors.bookTitle && <span className="error-msg">{errors.bookTitle}</span>}
+                      {(selectedBook.synopsis || selectedBook.description) && (
+                        <p className="book-preview__desc">
+                          {(() => {
+                            const text = selectedBook.synopsis || selectedBook.description;
+                            return text.length > 300 ? text.slice(0, 300) + '…' : text;
+                          })()}
+                        </p>
+                      )}
                     </div>
-                    <div className="form-group">
-                      <label>{p.genre} *</label>
-                      <select
-                        name="genre" value={form.genre} onChange={handleChange}
-                        className={errors.genre ? 'input-error' : ''}
-                      >
-                        <option value="">{p.genrePlaceholder}</option>
-                        {genreList.map((g) => (
-                          <option key={g.id} value={g.name}>{genreLabel(g, lang)}</option>
+                  </div>
+
+                  {availableChapters.length > 0 ? (
+                    <div className="payment-section" style={{ marginTop: '1rem' }}>
+                      <h2 className="payment-section__title">Pilih Bab</h2>
+                      <div className="chapter-checklist">
+                        {availableChapters.map((ch) => (
+                          <label key={ch.id} className={`chapter-checklist__item${selectedChapterIds.includes(ch.id) ? ' chapter-checklist__item--checked' : ''}`}>
+                            <input
+                              type="checkbox"
+                              checked={selectedChapterIds.includes(ch.id)}
+                              onChange={() => toggleChapter(ch.id)}
+                            />
+                            <span className="chapter-checklist__num">Bab {ch.number}</span>
+                            <span className="chapter-checklist__title">{ch.title}</span>
+                            {ch.price > 0 && <span className="chapter-checklist__price">{fmt(ch.price)}</span>}
+                          </label>
                         ))}
-                      </select>
-                      {errors.genre && <span className="error-msg">{errors.genre}</span>}
+                      </div>
+                      {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
+                      {selectedChapterIds.length > 0 && (
+                        <p className="chapter-hint" style={{ marginTop: '0.5rem' }}>
+                          {selectedChapterIds.length} bab dipilih · Total: <strong>{fmt(total)}</strong>
+                        </p>
+                      )}
                     </div>
-                  </>
-                )}
+                  ) : (
+                    <div className="payment-section" style={{ marginTop: '1rem' }}>
+                      <h2 className="payment-section__title">Jumlah Bab</h2>
+                      <div className="chapter-selector">
+                        <button type="button" className="chapter-btn" onClick={() => setChapters((c) => Math.max(1, c - 1))}>−</button>
+                        <input
+                          type="number" min="1" value={chapters}
+                          onChange={(e) => setChapters(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="chapter-input"
+                        />
+                        <button type="button" className="chapter-btn" onClick={() => setChapters((c) => c + 1)}>+</button>
+                        <span className="chapter-label">{p.chaptersUnit}</span>
+                      </div>
+                      {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
+                      <p className="chapter-hint">
+                        {chapters} {p.chaptersUnit} × {fmt(unitPrice)} = <strong>{fmt(total)}</strong>
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="payment-preview-placeholder">
+                  <p>Pilih buku untuk melihat preview &amp; daftar bab.</p>
+                </div>
+              )
+            ) : null}
+          </div>
+
+          {/* ── RIGHT: Contact + Summary + Submit ── */}
+          <div className="payment-col payment-col--right">
+            <div className="payment-section">
+              <h2 className="payment-section__title">{p.contactInfo}</h2>
+              <div className="form-group">
+                <label>{p.name} *</label>
+                <input
+                  name="name" type="text" value={form.name}
+                  onChange={handleChange} className={errors.name ? 'input-error' : ''}
+                />
+                {errors.name && <span className="error-msg">{errors.name}</span>}
+              </div>
+              <div className="form-group">
+                <label>{p.email} *</label>
+                <input
+                  name="email" type="email" value={form.email}
+                  onChange={handleChange} className={errors.email ? 'input-error' : ''}
+                />
+                {errors.email && <span className="error-msg">{errors.email}</span>}
+              </div>
+              <div className="form-group">
+                <label>{p.phone} *</label>
+                <input
+                  name="phone" type="tel" value={form.phone}
+                  onChange={handleChange} placeholder={p.phonePlaceholder}
+                  className={errors.phone ? 'input-error' : ''}
+                />
+                {errors.phone && <span className="error-msg">{errors.phone}</span>}
+              </div>
+              {isPerChapter && (
                 <div className="form-group">
                   <label>{p.notes}</label>
                   <textarea
-                    name="notes" rows={3} value={form.notes}
+                    name="notes" rows={2} value={form.notes}
                     onChange={handleChange} placeholder={p.notesPlaceholder}
                   />
                 </div>
-              </div>
+              )}
+            </div>
 
-              {/* Contact */}
-              <div className="payment-section">
-                <h2 className="payment-section__title">{p.contactInfo}</h2>
-                <div className="form-group">
-                  <label>{p.name} *</label>
-                  <input
-                    name="name" type="text" value={form.name}
-                    onChange={handleChange} className={errors.name ? 'input-error' : ''}
-                  />
-                  {errors.name && <span className="error-msg">{errors.name}</span>}
-                </div>
-                <div className="form-group">
-                  <label>{p.email} *</label>
-                  <input
-                    name="email" type="email" value={form.email}
-                    onChange={handleChange} className={errors.email ? 'input-error' : ''}
-                  />
-                  {errors.email && <span className="error-msg">{errors.email}</span>}
-                </div>
-                <div className="form-group">
-                  <label>{p.phone} *</label>
-                  <input
-                    name="phone" type="tel" value={form.phone}
-                    onChange={handleChange} placeholder={p.phonePlaceholder}
-                    className={errors.phone ? 'input-error' : ''}
-                  />
-                  {errors.phone && <span className="error-msg">{errors.phone}</span>}
-                </div>
-              </div>
-
-              <button type="submit" className="btn btn-primary payment-submit" disabled={submitting}>
-                {submitting ? p.processing : p.submit}
-              </button>
-              {submitError && <p className="error-msg" style={{ marginTop: '0.8rem' }}>{submitError}</p>}
-            </form>
-          </div>
-
-          {/* Order summary */}
-          <div className="payment-summary">
             <div className="payment-summary__card">
               <h2 className="payment-summary__title">{p.orderSummary}</h2>
               <div className="payment-summary__pkg-name">{pkg.name}</div>
@@ -517,7 +521,7 @@ function Payment() {
                   </div>
                   <div className="payment-summary__row">
                     <span>{p.chapters}</span>
-                    <span>{chapters}</span>
+                    <span>{chapterCount}</span>
                   </div>
                 </>
               ) : (
@@ -553,9 +557,14 @@ function Payment() {
                 </div>
                 <p className="payment-summary__method-note">{p.bankNote}</p>
               </div>
+              <button type="submit" className="btn btn-primary payment-submit" disabled={submitting}>
+                {submitting ? p.processing : p.submit}
+              </button>
+              {submitError && <p className="error-msg" style={{ marginTop: '0.8rem' }}>{submitError}</p>}
             </div>
           </div>
-        </div>
+
+        </form>
       </div>
     </div>
   );
