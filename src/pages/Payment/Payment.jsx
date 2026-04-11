@@ -64,7 +64,7 @@ function Payment() {
           setBankAccountNumber(configResult.value.bank_account_number || '');
         }
         if (pkgData.type === 'per_chapter') {
-          booksApi.list().then(setBookList).catch(() => {});
+          booksApi.list({ is_template: true }).then(setBookList).catch(() => {});
         }
         setForm((prev) => ({
           ...prev,

@@ -35,6 +35,7 @@ export const booksApi = {
     if (params.search) qs.set('search', params.search);
     if (params.genre && params.genre !== 'All') qs.set('genre', params.genre);
     if (params.featured !== undefined) qs.set('featured', params.featured);
+    if (params.is_template !== undefined) qs.set('is_template', params.is_template);
     return request(`/books${qs.toString() ? `?${qs}` : ''}`);
   },
   genres: () => request('/books/genres'),

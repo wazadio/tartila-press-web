@@ -471,10 +471,12 @@ function AdminDashboard() {
                     <tr>
                       <th>{a.colTitle}</th>
                       <th>{a.colAuthor}</th>
+                      <th>Bidang</th>
                       <th>{a.colGenre}</th>
                       <th>{a.colYear}</th>
                       <th>{a.colPrice}</th>
                       <th>{a.colFeatured}</th>
+                      <th>Template</th>
                       <th>{a.colActions}</th>
                     </tr>
                   </thead>
@@ -483,12 +485,18 @@ function AdminDashboard() {
                       <tr key={book.id}>
                         <td><Link to={`/books/${book.id}`}>{book.title}</Link></td>
                         <td>{book.author}</td>
+                        <td>{book.bidang || '—'}</td>
                         <td><span className="badge">{book.genre}</span></td>
                         <td>{book.published_year}</td>
                         <td>Rp {book.price.toLocaleString('id-ID')}</td>
                         <td>
                           <span className={`status-dot ${book.featured ? 'status-dot--yes' : 'status-dot--no'}`}>
                             {book.featured ? a.yes : a.no}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`status-dot ${book.is_template ? 'status-dot--yes' : 'status-dot--no'}`}>
+                            {book.is_template ? a.yes : a.no}
                           </span>
                         </td>
                         <td>

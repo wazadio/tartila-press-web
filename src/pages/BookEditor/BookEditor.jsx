@@ -414,6 +414,8 @@ function BookEditor() {
     isbn: '',
     price: '',
     featured: false,
+    is_template: false,
+    bidang: '',
     cover: '',
     chapters: [createChapter(1, '', '')],
   });
@@ -445,6 +447,8 @@ function BookEditor() {
             isbn: existing.isbn || '',
             price: existing.price || '',
             featured: existing.featured || false,
+            is_template: existing.is_template || false,
+            bidang: existing.bidang || '',
             cover: existing.cover || '',
             chapters: [createChapter(1, 'Chapter 1', toEditorHtml(existing.description || ''))],
           });
@@ -490,6 +494,8 @@ function BookEditor() {
       isbn: form.isbn || null,
       price: Number(form.price),
       featured: form.featured,
+      is_template: form.is_template,
+      bidang: form.bidang || null,
       cover: form.cover || null,
       description: mergedDescription,
     };
@@ -788,6 +794,14 @@ function BookEditor() {
 
           <div className="form-row">
             <div className="form-group">
+              <label htmlFor="bidang">Bidang</label>
+              <input
+                id="bidang" name="bidang" type="text"
+                value={form.bidang} onChange={handleChange}
+                placeholder="e.g. Ilmu Sosial, Sains, Sastra…"
+              />
+            </div>
+            <div className="form-group">
               <label htmlFor="genre">Genre *</label>
               <select id="genre" name="genre" value={form.genre} onChange={handleChange} className={errors.genre ? 'input-error' : ''}>
                 <option value="">Select genre…</option>
@@ -798,6 +812,7 @@ function BookEditor() {
               </select>
               {errors.genre && <span className="error-msg">{errors.genre}</span>}
             </div>
+          </div>
             <div className="form-group">
               <label htmlFor="publishedYear">Published Year *</label>
               <input id="publishedYear" name="publishedYear" type="number" min="1900" max="2100" value={form.publishedYear} onChange={handleChange} className={errors.publishedYear ? 'input-error' : ''} />
@@ -1054,6 +1069,16 @@ function BookEditor() {
           <div className="form-group form-group--checkbox">
             <input id="featured" name="featured" type="checkbox" checked={form.featured} onChange={handleChange} />
             <label htmlFor="featured">Feature this book on the homepage</label>
+          </div>
+
+          <div className="form-group form-group--checkbox">
+            <input id="is_template" name="is_template" type="checkbox" checked={form.is_template} onChange={handleChange} />
+            <label htmlFor="is_template">This book is a <strong>Per-Chapter template</strong> (available for selection in per-chapter package orders)</label>
+          </div>
+
+          <div className="form-group form-group--checkbox">
+            <input id="is_template" name="is_template" type="checkbox" checked={form.is_template} onChange={handleChange} />
+            <label htmlFor="is_template">This book is a <strong>Per-Chapter template</strong> (available for selection in per-chapter package orders)</label>
           </div>
 
           <div className="editor-form__actions">

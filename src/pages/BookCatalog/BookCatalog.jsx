@@ -7,7 +7,9 @@ import './BookCatalog.css';
 function BookCatalog() {
   const [books, setBooks] = useState([]);
   const [genres, setGenres] = useState([]);
+  const [bidangList, setBidangList] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('All');
+  const [selectedBidang, setSelectedBidang] = useState('All');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const { t, lang } = useLang();
@@ -15,6 +17,11 @@ function BookCatalog() {
 
   useEffect(() => {
     genresApi.list().then(setGenres).catch(() => {});
+    // derive bidang list from all books
+    booksApi.list().then((all) => {
+      const unique = [...new Set(all.map((b) => b.bidang).filter(Boolean))].sort();
+      setBidangList(unique);
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -22,11 +29,12 @@ function BookCatalog() {
     const params = {};
     if (search) params.search = search;
     if (selectedGenre !== 'All') params.genre = selectedGenre;
+    if (selectedBidang !== 'All') params.bidang = selectedBidang;
     booksApi.list(params)
       .then(setBooks)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [search, selectedGenre]);
+  }, [search, selectedGenre, selectedBidang]);
 
   return (
     <div className="book-catalog">
@@ -48,6 +56,22 @@ function BookCatalog() {
               aria-label={c.title}
             />
           </div>
+          {bidangList.length > 0 && (
+            <div className="catalog-filters">
+              <span className="catalog-filters-label">Bidang</span>
+              <button
+                className={`filter-btn${selectedBidang === 'All' ? ' active' : ''}`}
+                onClick={() => setSelectedBidang('All')}
+              >{c.all}</button>
+              {bidangList.map((b) => (
+                <button
+                  key={b}
+                  className={`filter-btn${selectedBidang === b ? ' active' : ''}`}
+                  onClick={() => setSelectedBidang(b)}
+                >{b}</button>
+              ))}
+            </div>
+          )}
           <div className="catalog-filters">
             <span className="catalog-filters-label">{c.genre}</span>
             <button
