@@ -228,6 +228,20 @@
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
   margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.my-tx-manuscript__quota {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(36, 62, 99, 0.08);
+  color: var(--color-navy);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .my-tx-manuscript__list {
@@ -310,6 +324,13 @@
   font-size: 0.8rem;
   color: var(--color-text-muted);
   margin: 0.5rem 0 0;
+}
+
+.my-tx-manuscript__limit {
+  font-size: 0.8rem;
+  color: #1a6e3c;
+  font-weight: 600;
+  margin: 0.25rem 0 0;
 }
 
 @media (max-width: 600px) {

@@ -115,8 +115,14 @@ function MyTransactions() {
             <div className="my-tx-list">
               {visibleTransactions.map((tx) => {
                 const isPublishing = (tx.transaction_type || 'publishing') === 'publishing';
-                const canUpload = isPublishing && tx.status === 'paid';
                 const txUpload = uploadState[tx.id] || {};
+
+                // File limit: per_book = 1, per_chapter = chapters ordered
+                const maxFiles = tx.package_type === 'per_chapter' ? (tx.chapters || 1) : 1;
+                const uploadedCount = tx.manuscript_files ? tx.manuscript_files.length : 0;
+                const remainingSlots = maxFiles - uploadedCount;
+                const limitReached = remainingSlots <= 0;
+                const canUpload = isPublishing && tx.status === 'paid' && !limitReached;
 
                 return (
                   <div key={tx.id} className="my-tx-card">
@@ -192,7 +198,12 @@ function MyTransactions() {
 
                     {isPublishing && (
                       <div className="my-tx-manuscript">
-                        <div className="my-tx-manuscript__title">📄 Naskah</div>
+                        <div className="my-tx-manuscript__title">
+                          📄 Naskah
+                          <span className="my-tx-manuscript__quota">
+                            {uploadedCount}/{maxFiles} file
+                          </span>
+                        </div>
 
                         {tx.manuscript_files && tx.manuscript_files.length > 0 ? (
                           <ul className="my-tx-manuscript__list">
@@ -208,14 +219,21 @@ function MyTransactions() {
                           <p className="my-tx-manuscript__empty">Belum ada naskah yang diupload.</p>
                         )}
 
+                        {tx.status === 'paid' && limitReached && (
+                          <p className="my-tx-manuscript__limit">
+                            ✓ Semua naskah sudah diupload ({maxFiles}/{maxFiles}).
+                          </p>
+                        )}
+
                         {canUpload && (
                           <div className="my-tx-manuscript__upload">
                             <label className="my-tx-manuscript__upload-btn">
-                              {txUpload.uploading ? '⏳ Mengupload…' : '+ Tambah Naskah'}
+                              {txUpload.uploading
+                                ? '⏳ Mengupload…'
+                                : `+ Tambah Naskah (${remainingSlots} slot tersisa)`}
                               <input
                                 type="file"
                                 accept=".pdf,.doc,.docx"
-                                multiple
                                 disabled={txUpload.uploading}
                                 style={{ display: 'none' }}
                                 onChange={(e) => e.target.files?.length && handleUpload(tx.id, e.target.files)}
