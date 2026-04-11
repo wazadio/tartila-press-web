@@ -96,6 +96,13 @@ export const genresApi = {
   delete: (id) => request(`/genres/${id}`, { method: 'DELETE' }),
 };
 
+// ── Book Chapters ─────────────────────────────────────────────────────────────
+
+export const bookChaptersApi = {
+  list: (bookId) => request(`/books/${bookId}/chapters`),
+  replace: (bookId, body) => request(`/books/${bookId}/chapters`, { method: 'PUT', body: JSON.stringify(body) }),
+};
+
 // ── Writers ───────────────────────────────────────────────────────────────────
 
 export const writersApi = {

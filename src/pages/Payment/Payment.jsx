@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { packagesApi, genresApi, transactionsApi } from '../../services/api';
+import { packagesApi, genresApi, transactionsApi, booksApi, bookChaptersApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
 import './Payment.css';
@@ -32,6 +32,10 @@ function Payment() {
   const [bankAccountNumber, setBankAccountNumber] = useState('');
 
   const [chapters, setChapters] = useState(1);
+  const [bookList, setBookList] = useState([]);
+  const [selectedBookId, setSelectedBookId] = useState('');
+  const [availableChapters, setAvailableChapters] = useState([]);
+  const [selectedChapterIds, setSelectedChapterIds] = useState([]);
   const [form, setForm] = useState({
     bookTitle: '',
     genre: '',
@@ -59,6 +63,9 @@ function Payment() {
           setBankAccountName(configResult.value.bank_account_name || '');
           setBankAccountNumber(configResult.value.bank_account_number || '');
         }
+        if (pkgData.type === 'per_chapter') {
+          booksApi.list().then(setBookList).catch(() => {});
+        }
         setForm((prev) => ({
           ...prev,
           name: user?.name || '',
@@ -71,7 +78,39 @@ function Payment() {
 
   const isPerChapter = pkg?.type === 'per_chapter';
   const unitPrice = pkg?.final_price || 0;
-  const total = isPerChapter ? unitPrice * chapters : unitPrice;
+
+  // total: if chapters have individual prices, sum those; otherwise unit_price × count
+  const selectedChapters = availableChapters.filter((c) => selectedChapterIds.includes(c.id));
+  const total = isPerChapter
+    ? (selectedChapters.length > 0
+        ? selectedChapters.reduce((sum, c) => sum + (c.price || unitPrice), 0)
+        : unitPrice * chapters)
+    : unitPrice;
+  const chapterCount = isPerChapter
+    ? (selectedChapterIds.length > 0 ? selectedChapterIds.length : chapters)
+    : 1;
+
+  function handleBookSelect(e) {
+    const bookId = e.target.value;
+    setSelectedBookId(bookId);
+    setSelectedChapterIds([]);
+    setAvailableChapters([]);
+    if (bookId) {
+      const book = bookList.find((b) => String(b.id) === String(bookId));
+      setForm((prev) => ({ ...prev, bookTitle: book?.title || '' }));
+      bookChaptersApi.list(bookId)
+        .then((chs) => { setAvailableChapters(chs); })
+        .catch(() => {});
+    } else {
+      setForm((prev) => ({ ...prev, bookTitle: '' }));
+    }
+  }
+
+  function toggleChapter(chId) {
+    setSelectedChapterIds((prev) =>
+      prev.includes(chId) ? prev.filter((x) => x !== chId) : [...prev, chId]
+    );
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -86,7 +125,9 @@ function Payment() {
     if (!form.email.trim()) errs.email = p.emailRequired;
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = p.emailInvalid;
     if (!form.phone.trim()) errs.phone = p.phoneRequired;
-    if (isPerChapter && chapters < 1) errs.chapters = p.chaptersRequired;
+    if (isPerChapter && availableChapters.length > 0 && selectedChapterIds.length === 0)
+      errs.chapters = 'Please select at least one chapter.';
+    if (isPerChapter && availableChapters.length === 0 && chapters < 1) errs.chapters = p.chaptersRequired;
     return errs;
   }
 
@@ -102,11 +143,16 @@ function Payment() {
         package_id: pkg.id,
         book_title: form.bookTitle,
         genre: form.genre,
-        chapters,
+        chapters: chapterCount,
         customer_name: form.name,
         customer_email: form.email,
         customer_phone: form.phone,
-        notes: form.notes,
+        notes: [
+          form.notes,
+          selectedChapters.length > 0
+            ? 'Chapters: ' + selectedChapters.map((c) => `Ch.${c.number} ${c.title}`).join(', ')
+            : '',
+        ].filter(Boolean).join('\n'),
       });
       setTransaction(created);
       setBankName(created.bank_name || bankName);
@@ -206,30 +252,63 @@ function Payment() {
               {isPerChapter && (
                 <div className="payment-section">
                   <h2 className="payment-section__title">{p.chapterSelection}</h2>
-                  <div className="chapter-selector">
-                    <button
-                      type="button"
-                      className="chapter-btn"
-                      onClick={() => setChapters((c) => Math.max(1, c - 1))}
-                    >−</button>
-                    <input
-                      type="number"
-                      min="1"
-                      value={chapters}
-                      onChange={(e) => setChapters(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="chapter-input"
-                    />
-                    <button
-                      type="button"
-                      className="chapter-btn"
-                      onClick={() => setChapters((c) => c + 1)}
-                    >+</button>
-                    <span className="chapter-label">{p.chaptersUnit}</span>
-                  </div>
-                  {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
-                  <p className="chapter-hint">
-                    {chapters} {p.chaptersUnit} × {fmt(unitPrice)} = <strong>{fmt(total)}</strong>
-                  </p>
+
+                  {/* Book selector */}
+                  {bookList.length > 0 && (
+                    <div className="form-group">
+                      <label>Select Book</label>
+                      <select value={selectedBookId} onChange={handleBookSelect}>
+                        <option value="">— pick a book —</option>
+                        {bookList.map((b) => (
+                          <option key={b.id} value={b.id}>{b.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Sellable chapters checklist */}
+                  {availableChapters.length > 0 ? (
+                    <div className="form-group">
+                      <label>Select Chapters</label>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.4rem' }}>
+                        {availableChapters.map((ch) => (
+                          <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={selectedChapterIds.includes(ch.id)}
+                              onChange={() => toggleChapter(ch.id)}
+                            />
+                            <span>Ch.{ch.number} — {ch.title}</span>
+                            {ch.price > 0 && <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>{fmt(ch.price)}</span>}
+                          </label>
+                        ))}
+                      </div>
+                      {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
+                      {selectedChapterIds.length > 0 && (
+                        <p className="chapter-hint" style={{ marginTop: '0.5rem' }}>
+                          {selectedChapterIds.length} chapter(s) selected · Total: <strong>{fmt(total)}</strong>
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    /* Fallback: manual chapter count if no sellable chapters defined */
+                    <>
+                      <div className="chapter-selector">
+                        <button type="button" className="chapter-btn" onClick={() => setChapters((c) => Math.max(1, c - 1))}>−</button>
+                        <input
+                          type="number" min="1" value={chapters}
+                          onChange={(e) => setChapters(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="chapter-input"
+                        />
+                        <button type="button" className="chapter-btn" onClick={() => setChapters((c) => c + 1)}>+</button>
+                        <span className="chapter-label">{p.chaptersUnit}</span>
+                      </div>
+                      {errors.chapters && <p className="error-msg">{errors.chapters}</p>}
+                      <p className="chapter-hint">
+                        {chapters} {p.chaptersUnit} × {fmt(unitPrice)} = <strong>{fmt(total)}</strong>
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 

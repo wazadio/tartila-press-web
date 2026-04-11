@@ -11,7 +11,7 @@ import {
   TextRun,
 } from 'docx';
 import 'react-quill/dist/quill.snow.css';
-import { authorsApi, booksApi, uploadsApi, genresApi } from '../../services/api';
+import { authorsApi, booksApi, uploadsApi, genresApi, bookChaptersApi } from '../../services/api';
 import './BookEditor.css';
 
 const editorModules = {
@@ -425,6 +425,7 @@ function BookEditor() {
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [coverUploadError, setCoverUploadError] = useState('');
   const [useRichEditor, setUseRichEditor] = useState(true);
+  const [sellableChapters, setSellableChapters] = useState([]);
 
   useEffect(() => {
     const fetches = [authorsApi.list(), genresApi.list()];
@@ -447,6 +448,8 @@ function BookEditor() {
             cover: existing.cover || '',
             chapters: [createChapter(1, 'Chapter 1', toEditorHtml(existing.description || ''))],
           });
+          // load sellable chapters
+          bookChaptersApi.list(id).then(setSellableChapters).catch(() => {});
         }
       })
       .catch(() => {})
@@ -514,10 +517,16 @@ function BookEditor() {
 
     setSaveError('');
     try {
+      let savedId = id;
       if (isEditing) {
         await booksApi.update(id, payload);
       } else {
-        await booksApi.create(payload);
+        const created = await booksApi.create(payload);
+        savedId = created.id;
+      }
+      // save sellable chapters
+      if (savedId) {
+        await bookChaptersApi.replace(savedId, sellableChapters.map(({ number, title, price }) => ({ number, title, price })));
       }
       navigate('/admin');
     } catch (err) {
@@ -990,6 +999,80 @@ function BookEditor() {
                 );
               })}
             </div>
+          </div>
+
+          <div className="chapters-section" style={{ marginTop: '2rem' }}>
+            <div className="chapters-section__header">
+              <label>Chapters for Sale</label>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setSellableChapters((prev) => [
+                  ...prev,
+                  { number: prev.length + 1, title: '', price: 0 },
+                ])}
+              >
+                + Add Chapter
+              </button>
+            </div>
+            <p className="form-hint">Define which chapters customers can purchase individually (used for Per Chapter packages).</p>
+
+            {sellableChapters.length === 0 ? (
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>No sellable chapters added yet.</p>
+            ) : (
+              <div className="admin-table-wrapper" style={{ marginTop: '0.75rem' }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Chapter Title</th>
+                      <th>Price (Rp)</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sellableChapters.map((ch, i) => (
+                      <tr key={i}>
+                        <td style={{ width: '3rem' }}>
+                          <input
+                            type="number"
+                            min="1"
+                            value={ch.number}
+                            onChange={(e) => setSellableChapters((prev) => prev.map((c, idx) => idx === i ? { ...c, number: parseInt(e.target.value) || 1 } : c))}
+                            style={{ width: '3.5rem' }}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            value={ch.title}
+                            onChange={(e) => setSellableChapters((prev) => prev.map((c, idx) => idx === i ? { ...c, title: e.target.value } : c))}
+                            placeholder="e.g. Chapter 1: The Beginning"
+                            style={{ width: '100%' }}
+                          />
+                        </td>
+                        <td style={{ width: '8rem' }}>
+                          <input
+                            type="number"
+                            min="0"
+                            value={ch.price}
+                            onChange={(e) => setSellableChapters((prev) => prev.map((c, idx) => idx === i ? { ...c, price: parseInt(e.target.value) || 0 } : c))}
+                            style={{ width: '7rem' }}
+                          />
+                        </td>
+                        <td style={{ width: '3rem' }}>
+                          <button
+                            type="button"
+                            className="btn btn-danger btn-sm"
+                            onClick={() => setSellableChapters((prev) => prev.filter((_, idx) => idx !== i))}
+                          >×</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           <div className="form-group form-group--checkbox">
