@@ -158,6 +158,160 @@
   letter-spacing: 0.05em;
 }
 
+/* Filter bar */
+.my-tx-filters {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.my-tx-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.my-tx-filter-btn:hover {
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+}
+
+.my-tx-filter-btn--active {
+  background: var(--color-navy);
+  border-color: var(--color-navy);
+  color: #fff;
+}
+
+.my-tx-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: var(--color-brass, #b08d57);
+  color: #fff;
+}
+
+.my-tx-filter-btn--active .my-tx-filter-badge {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+/* Manuscript section per card */
+.my-tx-manuscript {
+  margin: 0 1.5rem 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper);
+}
+
+.my-tx-manuscript__title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.my-tx-manuscript__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.my-tx-manuscript__item {
+  display: inline-flex;
+}
+
+.my-tx-manuscript__link {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: rgba(36, 62, 99, 0.08);
+  color: var(--color-navy);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.my-tx-manuscript__link:hover {
+  background: var(--color-navy);
+  color: #fff;
+}
+
+.my-tx-manuscript__empty {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.my-tx-manuscript__upload {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.my-tx-manuscript__upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  border: 1.5px solid var(--color-navy);
+  border-radius: var(--radius-sm);
+  color: var(--color-navy);
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.my-tx-manuscript__upload-btn:hover {
+  background: var(--color-navy);
+  color: #fff;
+}
+
+.my-tx-manuscript__upload-hint {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.my-tx-manuscript__error {
+  width: 100%;
+  font-size: 0.8rem;
+  color: var(--color-red, #dc2626);
+  margin: 0.25rem 0 0;
+}
+
+.my-tx-manuscript__locked {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0.5rem 0 0;
+}
+
 @media (max-width: 600px) {
   .my-tx-card__body {
     grid-template-columns: 1fr 1fr;

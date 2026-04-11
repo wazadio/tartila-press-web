@@ -6,7 +6,9 @@ function getToken() {
 
 async function request(path, options = {}) {
   const token = getToken();
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  const isFormData = options.body instanceof FormData;
+  const headers = isFormData ? {} : { 'Content-Type': 'application/json', ...options.headers };
+  if (!isFormData) Object.assign(headers, options.headers);
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
@@ -79,6 +81,19 @@ export const uploadsApi = {
     const base = BASE_URL.replace('/api', '');
     return { ...data, url: `${base}${data.url}` };
   },
+
+  uploadManuscript: async (file) => {
+    const token = getToken();
+    const body = new FormData();
+    body.append('file', file);
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${BASE_URL}/uploads/manuscript`, { method: 'POST', headers, body });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Upload gagal');
+    const base = BASE_URL.replace('/api', '');
+    return { ...data, url: `${base}${data.url}` };
+  },
 };
 
 // ── Packages ──────────────────────────────────────────────────────────────────
@@ -130,5 +145,10 @@ export const transactionsApi = {
   listMine: () => request('/transactions/mine'),
   create: (body) => request('/transactions', { method: 'POST', body: JSON.stringify(body) }),
   update: (id, body) => request(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  uploadManuscript: (txId, file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return request(`/transactions/${txId}/upload-manuscript`, { method: 'POST', body: fd });
+  },
 };
 

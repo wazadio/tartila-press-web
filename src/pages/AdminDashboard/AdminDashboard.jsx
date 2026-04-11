@@ -1021,6 +1021,24 @@ function AdminDashboard() {
                     <span className="tx-modal__info-value" style={{ fontStyle: 'italic', fontSize: '0.85rem' }}>{editingTx.notes}</span>
                   </div>
                 )}
+                {editingTx.manuscript_files && editingTx.manuscript_files.length > 0 && (
+                  <div className="tx-modal__info-row">
+                    <span className="tx-modal__info-label">Naskah</span>
+                    <span className="tx-modal__info-value">
+                      {editingTx.manuscript_files.map((url, i) => (
+                        <a
+                          key={i}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="tx-modal__file-link"
+                        >
+                          📄 File {i + 1}
+                        </a>
+                      ))}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {editingTx.stock_exhausted && (
