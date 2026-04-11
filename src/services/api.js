@@ -15,6 +15,12 @@ async function request(path, options = {}) {
 
   if (res.status === 204) return null;
 
+  const contentType = res.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    if (!res.ok) throw new Error(`Server error ${res.status}${res.status === 413 ? ': File terlalu besar' : ''}`);
+    return null;
+  }
+
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Request failed');
   return data;
