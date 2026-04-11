@@ -797,6 +797,11 @@ function BookEditor() {
             </div>
           </div>
 
+          <div className="form-group form-group--checkbox">
+            <input id="is_template" name="is_template" type="checkbox" checked={form.is_template} onChange={handleChange} />
+            <label htmlFor="is_template">This book is a <strong>Per-Chapter template</strong> (available for selection in per-chapter package orders)</label>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="bidang_id">Bidang</label>
@@ -850,11 +855,11 @@ function BookEditor() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="synopsis">Deskripsi Singkat</label>
+            <label htmlFor="synopsis">Deskripsi</label>
             <textarea
               id="synopsis" name="synopsis" rows={4}
               value={form.synopsis} onChange={handleChange}
-              placeholder="Ringkasan atau blurb buku yang ditampilkan di halaman payment dan katalog…"
+              placeholder="Ringkasan atau blurb buku yang ditampilkan di halaman detail, payment, dan katalog…"
             />
           </div>
 
@@ -889,6 +894,7 @@ function BookEditor() {
             <small className="form-hint">Paste a URL or upload an image (JPEG, PNG, WebP, GIF · max 5 MB).</small>
           </div>
 
+          {!form.is_template && (<>
           <div className="chapters-section">
             <div className="chapters-section__header">
               <label>Book Chapters <span style={{color:'var(--color-text-muted)',fontWeight:400,fontSize:'0.85rem'}}>(optional)</span></label>
@@ -1085,15 +1091,11 @@ function BookEditor() {
               </div>
             )}
           </div>
+          </>)}
 
           <div className="form-group form-group--checkbox">
             <input id="featured" name="featured" type="checkbox" checked={form.featured} onChange={handleChange} />
             <label htmlFor="featured">Feature this book on the homepage</label>
-          </div>
-
-          <div className="form-group form-group--checkbox">
-            <input id="is_template" name="is_template" type="checkbox" checked={form.is_template} onChange={handleChange} />
-            <label htmlFor="is_template">This book is a <strong>Per-Chapter template</strong> (available for selection in per-chapter package orders)</label>
           </div>
 
           <div className="editor-form__actions">

@@ -334,27 +334,24 @@ function Payment() {
                   {/* Book preview */}
                   {selectedBook && (
                     <div className="book-preview">
-                      <div className="book-preview__header">
-                        {selectedBook.cover && (
-                          <img src={selectedBook.cover} alt={selectedBook.title} className="book-preview__cover" />
-                        )}
-                        <div className="book-preview__meta">
-                          <div className="book-preview__title">{selectedBook.title}</div>
-                          <div className="book-preview__author">{selectedBook.author}</div>
-                          <div className="book-preview__tags">
-                            {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
-                            {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
-                          </div>
-                        </div>
-                      </div>
-                      {(selectedBook.synopsis || selectedBook.description) && (
-                        <p className="book-preview__desc">
-                          {(() => {
-                            const text = selectedBook.synopsis || selectedBook.description;
-                            return text.length > 300 ? text.slice(0, 300) + '…' : text;
-                          })()}
-                        </p>
+                      {selectedBook.cover && (
+                        <img src={selectedBook.cover} alt={selectedBook.title} className="book-preview__cover" />
                       )}
+                      <div className="book-preview__body">
+                        <div className="book-preview__title">{selectedBook.title}</div>
+                        <div className="book-preview__tags">
+                          {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
+                          {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
+                        </div>
+                        {(selectedBook.synopsis || selectedBook.description) && (
+                          <p className="book-preview__desc">
+                            {(() => {
+                              const text = selectedBook.synopsis || selectedBook.description;
+                              return text.length > 300 ? text.slice(0, 300) + '…' : text;
+                            })()}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -363,16 +360,17 @@ function Payment() {
                     availableChapters.length > 0 ? (
                       <div className="form-group">
                         <label>Pilih Bab</label>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.4rem' }}>
+                        <div className="chapter-checklist">
                           {availableChapters.map((ch) => (
-                            <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
+                            <label key={ch.id} className={`chapter-checklist__item${selectedChapterIds.includes(ch.id) ? ' chapter-checklist__item--checked' : ''}`}>
                               <input
                                 type="checkbox"
                                 checked={selectedChapterIds.includes(ch.id)}
                                 onChange={() => toggleChapter(ch.id)}
                               />
-                              <span>Bab {ch.number} — {ch.title}</span>
-                              {ch.price > 0 && <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>{fmt(ch.price)}</span>}
+                              <span className="chapter-checklist__num">Bab {ch.number}</span>
+                              <span className="chapter-checklist__title">{ch.title}</span>
+                              {ch.price > 0 && <span className="chapter-checklist__price">{fmt(ch.price)}</span>}
                             </label>
                           ))}
                         </div>

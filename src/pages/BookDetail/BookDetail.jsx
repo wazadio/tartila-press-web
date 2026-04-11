@@ -34,7 +34,8 @@ function BookDetail() {
   }
 
   const starsDisplay = '★'.repeat(Math.round(book.rating)) + '☆'.repeat(5 - Math.round(book.rating));
-  const looksLikeHtml = /<[^>]+>/.test(book.description || '');
+  const descriptionContent = book.description || book.synopsis || '';
+  const looksLikeHtml = /<[^>]+>/.test(descriptionContent);
 
   return (
     <div className="book-detail">
@@ -74,10 +75,10 @@ function BookDetail() {
             {looksLikeHtml ? (
               <div
                 className="book-detail__description"
-                dangerouslySetInnerHTML={{ __html: book.description }}
+                dangerouslySetInnerHTML={{ __html: descriptionContent }}
               />
             ) : (
-              <p className="book-detail__description">{book.description}</p>
+              <p className="book-detail__description">{descriptionContent}</p>
             )}
 
             <table className="book-detail__table">
