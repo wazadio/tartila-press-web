@@ -98,3 +98,18 @@
   font-weight: 700;
   color: var(--color-navy);
 }
+
+.book-card__stock {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #1a6e1a;
+  background: rgba(34, 139, 34, 0.1);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  align-self: flex-start;
+}
+
+.book-card__stock--empty {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}

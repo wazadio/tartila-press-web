@@ -30,6 +30,11 @@ function BookCard({ book }) {
             Rp {book.price.toLocaleString('id-ID')}
           </span>
         </div>
+        {book.stock != null && (
+          <div className={`book-card__stock${book.stock === 0 ? ' book-card__stock--empty' : ''}`}>
+            {book.stock === 0 ? 'Stok Habis' : `Sisa ${book.stock}`}
+          </div>
+        )}
       </div>
     </div>
   );

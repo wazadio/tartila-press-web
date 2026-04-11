@@ -222,6 +222,11 @@ function Packages() {
                         {book.author && (
                           <p className="pkg-book-card__author">{book.author}</p>
                         )}
+                        {book.stock != null && (
+                          <p className={`pkg-book-card__stock${book.stock === 0 ? ' pkg-book-card__stock--empty' : ''}`}>
+                            {book.stock === 0 ? 'Stok Habis' : `Sisa ${book.stock}`}
+                          </p>
+                        )}
                         <button
                           type="button"
                           className="pkg-book-card__select-btn"
