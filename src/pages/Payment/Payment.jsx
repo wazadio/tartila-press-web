@@ -38,6 +38,7 @@ function Payment() {
   const [bookList, setBookList] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [selectedBookId, setSelectedBookId] = useState('');
+  const [selectedBook, setSelectedBook] = useState(null);
   const [availableChapters, setAvailableChapters] = useState([]);
   const [selectedChapterIds, setSelectedChapterIds] = useState([]);
   const [form, setForm] = useState({
@@ -100,6 +101,7 @@ function Payment() {
     setSelectedBidangId(e.target.value);
     setSelectedGenreFilter('');
     setSelectedBookId('');
+    setSelectedBook(null);
     setAvailableChapters([]);
     setSelectedChapterIds([]);
     setForm((prev) => ({ ...prev, bookTitle: '', genre: '' }));
@@ -110,6 +112,7 @@ function Payment() {
     const genreName = e.target.value;
     setSelectedGenreFilter(genreName);
     setSelectedBookId('');
+    setSelectedBook(null);
     setAvailableChapters([]);
     setSelectedChapterIds([]);
     setForm((prev) => ({ ...prev, bookTitle: '', genre: genreName }));
@@ -124,11 +127,13 @@ function Payment() {
     setAvailableChapters([]);
     if (bookId) {
       const book = bookList.find((b) => String(b.id) === String(bookId));
+      setSelectedBook(book || null);
       setForm((prev) => ({ ...prev, bookTitle: book?.title || '' }));
       bookChaptersApi.list(bookId)
         .then((chs) => { setAvailableChapters(chs); })
         .catch(() => {});
     } else {
+      setSelectedBook(null);
       setForm((prev) => ({ ...prev, bookTitle: '' }));
     }
   }
@@ -323,6 +328,33 @@ function Payment() {
                           <option key={b.id} value={b.id}>{b.title}</option>
                         ))}
                       </select>
+                    </div>
+                  )}
+
+                  {/* Book preview */}
+                  {selectedBook && (
+                    <div className="book-preview">
+                      <div className="book-preview__header">
+                        {selectedBook.cover && (
+                          <img src={selectedBook.cover} alt={selectedBook.title} className="book-preview__cover" />
+                        )}
+                        <div className="book-preview__meta">
+                          <div className="book-preview__title">{selectedBook.title}</div>
+                          <div className="book-preview__author">{selectedBook.author}</div>
+                          <div className="book-preview__tags">
+                            {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
+                            {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
+                          </div>
+                        </div>
+                      </div>
+                      {(selectedBook.synopsis || selectedBook.description) && (
+                        <p className="book-preview__desc">
+                          {(() => {
+                            const text = selectedBook.synopsis || selectedBook.description;
+                            return text.length > 300 ? text.slice(0, 300) + '…' : text;
+                          })()}
+                        </p>
+                      )}
                     </div>
                   )}
 

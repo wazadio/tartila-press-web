@@ -18,7 +18,7 @@ function AuthorDetail() {
     setLoading(true);
     Promise.all([
       authorsApi.get(id),
-      booksApi.list(),
+      booksApi.list({ is_template: false }),
     ])
       .then(([authorData, allBooks]) => {
         setAuthor(authorData);

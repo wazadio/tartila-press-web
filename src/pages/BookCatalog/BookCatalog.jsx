@@ -26,6 +26,7 @@ function BookCatalog() {
     if (search) params.search = search;
     if (selectedGenre !== 'All') params.genre = selectedGenre;
     if (selectedBidangId !== null) params.bidang_id = selectedBidangId;
+    params.is_template = false;
     booksApi.list(params)
       .then(setBooks)
       .catch(() => {})

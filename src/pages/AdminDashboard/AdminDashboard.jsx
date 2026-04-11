@@ -554,6 +554,7 @@ function AdminDashboard() {
                       <th>{a.colAuthor}</th>
                       <th>Bidang</th>
                       <th>{a.colGenre}</th>
+                      <th>Deskripsi</th>
                       <th>{a.colYear}</th>
                       <th>{a.colPrice}</th>
                       <th>{a.colFeatured}</th>
@@ -568,6 +569,9 @@ function AdminDashboard() {
                         <td>{book.author}</td>
         <td>{book.bidang_name || '—'}</td>
                         <td><span className="badge">{book.genre}</span></td>
+                        <td style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', maxWidth: '200px' }}>
+                          {book.synopsis ? (book.synopsis.length > 80 ? book.synopsis.slice(0, 80) + '…' : book.synopsis) : '—'}
+                        </td>
                         <td>{book.published_year}</td>
                         <td>Rp {book.price.toLocaleString('id-ID')}</td>
                         <td>

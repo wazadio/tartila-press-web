@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { packagesApi } from '../../services/api';
+import { packagesApi, booksApi, bookChaptersApi } from '../../services/api';
 import { useLang } from '../../context/LanguageContext';
 import './Packages.css';
 
@@ -49,6 +49,10 @@ function Packages() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('packages');
+  const [templateBooks, setTemplateBooks] = useState([]);
+  const [expandedBookId, setExpandedBookId] = useState(null);
+  const [chaptersMap, setChaptersMap] = useState({});
   const { t } = useLang();
   const p = t.packages;
 
@@ -57,7 +61,19 @@ function Packages() {
       .then(setPackages)
       .catch(() => setError('Failed to load packages.'))
       .finally(() => setLoading(false));
+    booksApi.list({ is_template: true })
+      .then(setTemplateBooks)
+      .catch(() => {});
   }, []);
+
+  function toggleBook(bookId) {
+    setExpandedBookId((prev) => (prev === bookId ? null : bookId));
+    if (!chaptersMap[bookId]) {
+      bookChaptersApi.list(bookId)
+        .then((chs) => setChaptersMap((prev) => ({ ...prev, [bookId]: chs })))
+        .catch(() => setChaptersMap((prev) => ({ ...prev, [bookId]: [] })));
+    }
+  }
 
 
   const featureRows = [
@@ -82,9 +98,27 @@ function Packages() {
         </div>
       </section>
 
-      {/* Cards */}
-      <section className="packages-cards">
+      {/* Tabs */}
+      <div className="packages-tabs">
         <div className="container">
+          <button
+            className={`packages-tab${activeTab === 'packages' ? ' packages-tab--active' : ''}`}
+            onClick={() => setActiveTab('packages')}
+          >
+            Paket Penerbitan
+          </button>
+          <button
+            className={`packages-tab${activeTab === 'books' ? ' packages-tab--active' : ''}`}
+            onClick={() => setActiveTab('books')}
+          >
+            Buku &amp; Bab
+            {templateBooks.length > 0 && <span className="packages-tab__count">{templateBooks.length}</span>}
+          </button>
+        </div>
+      </div>
+
+      {/* Packages Tab */}
+      {activeTab === 'packages' && (
           {loading && <p className="packages-loading">{p.loading}</p>}
           {error && <p className="error-msg">{error}</p>}
 
@@ -121,6 +155,70 @@ function Packages() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+      )}
+      </>
+      )}
+
+      {/* Buku & Bab Tab */}
+      {activeTab === 'books' && (
+        <section className="packages-books">
+          <div className="container">
+            <h2 className="packages-books__title">Buku Tersedia untuk Pembelian Per Bab</h2>
+            <p className="packages-books__subtitle">Pilih buku dan bab yang ingin Anda terbitkan secara terpisah.</p>
+            {templateBooks.length === 0 ? (
+              <p className="packages-loading">Belum ada buku yang tersedia.</p>
+            ) : (
+              <div className="template-book-list">
+                {templateBooks.map((book) => {
+                  const isOpen = expandedBookId === book.id;
+                  const chapters = chaptersMap[book.id];
+                  return (
+                    <div key={book.id} className={`template-book-item${isOpen ? ' template-book-item--open' : ''}`}>
+                      <button className="template-book-header" onClick={() => toggleBook(book.id)}>
+                        <div className="template-book-header__left">
+                          {book.cover && <img src={book.cover} alt={book.title} className="template-book-cover" />}
+                          <div>
+                            <div className="template-book-title">{book.title}</div>
+                            <div className="template-book-meta">{book.author} · {book.genre}{book.bidang_name ? ` · ${book.bidang_name}` : ''}</div>
+                          </div>
+                        </div>
+                        <span className="template-book-toggle">{isOpen ? '▲' : '▼'}</span>
+                      </button>
+                      {isOpen && (
+                        <div className="template-book-chapters">
+                          {!chapters ? (
+                            <p className="template-book-loading">Memuat bab…</p>
+                          ) : chapters.length === 0 ? (
+                            <p className="template-book-empty">Belum ada bab yang ditentukan.</p>
+                          ) : (
+                            <table className="template-chapters-table">
+                              <thead>
+                                <tr>
+                                  <th>No.</th>
+                                  <th>Judul Bab</th>
+                                  <th>Harga</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {chapters.map((ch) => (
+                                  <tr key={ch.id}>
+                                    <td>{ch.number}</td>
+                                    <td>{ch.title}</td>
+                                    <td>{ch.price > 0 ? fmt(ch.price) : '—'}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
       )}

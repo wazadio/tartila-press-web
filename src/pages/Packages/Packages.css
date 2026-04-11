@@ -239,6 +239,173 @@
   color: var(--color-brass);
 }
 
+/* ── Tabs ──────────────────────────────────────────────────────────────────── */
+.packages-tabs {
+  background: var(--color-bg, #fff);
+  border-bottom: 2px solid var(--color-border, #e8e0d4);
+}
+
+.packages-tabs .container {
+  display: flex;
+  gap: 0;
+}
+
+.packages-tab {
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.packages-tab:hover {
+  color: var(--color-text);
+}
+
+.packages-tab--active {
+  color: var(--color-navy);
+  border-bottom-color: var(--color-navy);
+}
+
+.packages-tab__count {
+  background: var(--color-navy);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+}
+
+/* ── Buku & Bab ────────────────────────────────────────────────────────────── */
+.packages-books {
+  padding: 3rem 0;
+}
+
+.packages-books__title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-bottom: 0.4rem;
+}
+
+.packages-books__subtitle {
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+}
+
+.template-book-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.template-book-item {
+  border: 1px solid var(--color-border, #e8e0d4);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.template-book-item--open {
+  border-color: var(--color-navy);
+}
+
+.template-book-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--color-bg-subtle, #faf8f5);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 1rem;
+}
+
+.template-book-item--open .template-book-header {
+  background: var(--color-navy);
+  color: #fff;
+}
+
+.template-book-header__left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.template-book-cover {
+  width: 42px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.template-book-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.template-book-meta {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: 0.2rem;
+}
+
+.template-book-item--open .template-book-meta {
+  color: rgba(255,255,255,0.65);
+}
+
+.template-book-toggle {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.template-book-chapters {
+  padding: 1rem 1.25rem;
+}
+
+.template-book-loading,
+.template-book-empty {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+.template-chapters-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.template-chapters-table th {
+  text-align: left;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 2px solid var(--color-border, #e8e0d4);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.template-chapters-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border, #f0ebe3);
+}
+
+.template-chapters-table tr:last-child td {
+  border-bottom: none;
+}
+
 /* ── CTA ───────────────────────────────────────────────────────────────────── */
 .packages-cta {
   padding: 4rem 0;

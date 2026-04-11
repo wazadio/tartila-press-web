@@ -417,6 +417,7 @@ function BookEditor() {
     featured: false,
     is_template: false,
     bidang_id: '',
+    synopsis: '',
     cover: '',
     chapters: [createChapter(1, '', '')],
   });
@@ -451,6 +452,7 @@ function BookEditor() {
             featured: existing.featured || false,
             is_template: existing.is_template || false,
             bidang_id: existing.bidang_id || '',
+            synopsis: existing.synopsis || '',
             cover: existing.cover || '',
             chapters: [createChapter(1, 'Chapter 1', toEditorHtml(existing.description || ''))],
           });
@@ -498,6 +500,7 @@ function BookEditor() {
       featured: form.featured,
       is_template: form.is_template,
       bidang_id: form.bidang_id ? Number(form.bidang_id) : null,
+      synopsis: form.synopsis || null,
       cover: form.cover || null,
       description: mergedDescription,
     };
@@ -847,7 +850,13 @@ function BookEditor() {
           </div>
 
           <div className="form-group">
-            <label>Cover Image</label>
+            <label htmlFor="synopsis">Deskripsi Singkat</label>
+            <textarea
+              id="synopsis" name="synopsis" rows={4}
+              value={form.synopsis} onChange={handleChange}
+              placeholder="Ringkasan atau blurb buku yang ditampilkan di halaman payment dan katalog…"
+            />
+          </div>
             <div className="cover-upload-row">
               <input
                 id="cover"
@@ -1077,11 +1086,6 @@ function BookEditor() {
           <div className="form-group form-group--checkbox">
             <input id="featured" name="featured" type="checkbox" checked={form.featured} onChange={handleChange} />
             <label htmlFor="featured">Feature this book on the homepage</label>
-          </div>
-
-          <div className="form-group form-group--checkbox">
-            <input id="is_template" name="is_template" type="checkbox" checked={form.is_template} onChange={handleChange} />
-            <label htmlFor="is_template">This book is a <strong>Per-Chapter template</strong> (available for selection in per-chapter package orders)</label>
           </div>
 
           <div className="form-group form-group--checkbox">

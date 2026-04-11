@@ -12,7 +12,7 @@ function Landing() {
   const l = t.landing;
 
   useEffect(() => {
-    booksApi.list({ featured: true }).then(setFeaturedBooks).catch(() => {});
+    booksApi.list({ featured: true, is_template: false }).then(setFeaturedBooks).catch(() => {});
     authorsApi.list().then(setAuthors).catch(() => {});
   }, []);
 
