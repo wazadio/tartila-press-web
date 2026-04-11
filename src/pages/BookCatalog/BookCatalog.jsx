@@ -42,53 +42,65 @@ function BookCatalog() {
         </div>
 
         <div className="catalog-controls">
-          <div className="catalog-search-wrap">
-            <span className="catalog-search-icon">🔍</span>
-            <input
-              type="search"
-              className="catalog-search"
-              placeholder={c.searchPlaceholder}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label={c.title}
-            />
-          </div>
-          {bidangList.length > 0 && (
-            <div className="catalog-filters">
-              <span className="catalog-filters-label">Bidang</span>
-              <button
-                className={`filter-btn${selectedBidangId === null ? ' active' : ''}`}
-                onClick={() => setSelectedBidangId(null)}
-              >{c.all}</button>
-              {bidangList.map((b) => (
-                <button
-                  key={b.id}
-                  className={`filter-btn${selectedBidangId === b.id ? ' active' : ''}`}
-                  onClick={() => setSelectedBidangId(b.id)}
-                >{b.name}</button>
-              ))}
+          <div className="catalog-search-row">
+            <div className="catalog-search-wrap">
+              <span className="catalog-search-icon">🔍</span>
+              <input
+                type="search"
+                className="catalog-search"
+                placeholder={c.searchPlaceholder}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                aria-label={c.title}
+              />
             </div>
-          )}
-          <div className="catalog-filters">
-            <span className="catalog-filters-label">{c.genre}</span>
-            <button
-              className={`filter-btn${selectedGenre === 'All' ? ' active' : ''}`}
-              onClick={() => setSelectedGenre('All')}
-            >
-              {c.all}
-            </button>
-            {genres
-              .filter((g) => selectedBidangId === null || g.bidang_id === selectedBidangId)
-              .map((g) => (
-                <button
-                  key={g.id}
-                  className={`filter-btn${selectedGenre === g.name ? ' active' : ''}`}
-                  onClick={() => setSelectedGenre(g.name)}
+
+            {bidangList.length > 0 && (
+              <div className="catalog-select-wrap">
+                <label className="catalog-select-label">Bidang</label>
+                <select
+                  className="catalog-select"
+                  value={selectedBidangId ?? ''}
+                  onChange={(e) => {
+                    setSelectedBidangId(e.target.value ? Number(e.target.value) : null);
+                    setSelectedGenre('All');
+                  }}
                 >
-                  {lang === 'id' && g.name_id ? g.name_id : g.name}
-                </button>
-              ))
-            }
+                  <option value="">{c.all} Bidang</option>
+                  {bidangList.map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="catalog-select-wrap">
+              <label className="catalog-select-label">{c.genre}</label>
+              <select
+                className="catalog-select"
+                value={selectedGenre}
+                onChange={(e) => setSelectedGenre(e.target.value)}
+              >
+                <option value="All">{c.all} Genre</option>
+                {genres
+                  .filter((g) => selectedBidangId === null || g.bidang_id === selectedBidangId)
+                  .map((g) => (
+                    <option key={g.id} value={g.name}>
+                      {lang === 'id' && g.name_id ? g.name_id : g.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {(selectedBidangId !== null || selectedGenre !== 'All') && (
+              <button
+                type="button"
+                className="catalog-clear-btn"
+                onClick={() => { setSelectedBidangId(null); setSelectedGenre('All'); }}
+              >
+                ✕ Reset
+              </button>
+            )}
           </div>
         </div>
 
