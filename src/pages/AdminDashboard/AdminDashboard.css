@@ -367,6 +367,50 @@
 
 .author-genre-tag button:hover { opacity: 1; }
 
+/* Author photo upload in AuthorForm */
+.author-photo-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.author-photo-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+}
+
+.author-photo-upload__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.author-photo-upload__btn {
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.author-photo-upload__btn--loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.author-photo-upload__url {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
 /* ── Transaction status badges ─────────────────────────────────────── */
 .tx-status-badge {
   display: inline-block;

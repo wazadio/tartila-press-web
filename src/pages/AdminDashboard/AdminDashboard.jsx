@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { authorsApi, booksApi, packagesApi, genresApi, transactionsApi, bidangApi } from '../../services/api';
+import { authorsApi, booksApi, packagesApi, genresApi, transactionsApi, bidangApi, uploadsApi } from '../../services/api';
 import { useLang } from '../../context/LanguageContext';
 import './AdminDashboard.css';
 
@@ -132,6 +132,21 @@ function AuthorForm({ initial, genreList, onSave, onCancel, a }) {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState('');
+
+  async function handlePhotoFile(file) {
+    setPhotoUploading(true);
+    setPhotoUploadError('');
+    try {
+      const result = await uploadsApi.uploadImage(file);
+      setForm((prev) => ({ ...prev, photo: result.url }));
+    } catch (err) {
+      setPhotoUploadError(err.message || 'Gagal mengupload foto.');
+    } finally {
+      setPhotoUploading(false);
+    }
+  }
 
   function set(key, value) { setForm((prev) => ({ ...prev, [key]: value })); }
 
@@ -175,7 +190,30 @@ function AuthorForm({ initial, genreList, onSave, onCancel, a }) {
       <div className="pkg-form__row">
         <div className="pkg-form__field">
           <label>{a.authorPhoto}</label>
-          <input value={form.photo} onChange={(e) => set('photo', e.target.value)} placeholder="https://..." />
+          <div className="author-photo-upload">
+            {form.photo && (
+              <img src={form.photo} alt="preview" className="author-photo-preview" />
+            )}
+            <div className="author-photo-upload__controls">
+              <label className={`btn btn-secondary btn-sm author-photo-upload__btn${photoUploading ? ' author-photo-upload__btn--loading' : ''}`}>
+                {photoUploading ? '⏳ Mengupload…' : '📷 Pilih Foto'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  disabled={photoUploading}
+                  style={{ display: 'none' }}
+                  onChange={(e) => e.target.files?.[0] && handlePhotoFile(e.target.files[0])}
+                />
+              </label>
+              <input
+                value={form.photo}
+                onChange={(e) => set('photo', e.target.value)}
+                placeholder="atau tempel URL foto…"
+                className="author-photo-upload__url"
+              />
+            </div>
+            {photoUploadError && <p className="error-msg" style={{ marginTop: '0.25rem' }}>{photoUploadError}</p>}
+          </div>
         </div>
         <div className="pkg-form__field pkg-form__field--sm">
           <label>{a.authorBooksPublished}</label>
