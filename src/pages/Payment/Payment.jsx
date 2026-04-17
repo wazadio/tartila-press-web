@@ -119,9 +119,16 @@ function Payment() {
 
   // total: if chapters have individual prices, sum those; otherwise unit_price × count
   const selectedChapters = availableChapters.filter((c) => selectedChapterIds.includes(c.id));
+  // Apply package discount to chapter individual price
+  function chapterFinalPrice(c) {
+    const base = c.price > 0 ? c.price : (pkg?.price || 0);
+    const discount = pkg?.discount || 0;
+    return Math.round(base * (1 - discount / 100));
+  }
+
   const total = isPerChapter
     ? (selectedChapters.length > 0
-        ? selectedChapters.reduce((sum, c) => sum + (c.price || unitPrice), 0)
+        ? selectedChapters.reduce((sum, c) => sum + chapterFinalPrice(c), 0)
         : unitPrice * chapters)
     : unitPrice;
   const chapterCount = isPerChapter
@@ -547,14 +554,26 @@ function Payment() {
               <div className="payment-summary__divider" />
               {isPerChapter ? (
                 <>
-                  <div className="payment-summary__row">
-                    <span>{p.pricePerChapter}</span>
-                    <span>{fmt(unitPrice)}</span>
-                  </div>
-                  <div className="payment-summary__row">
-                    <span>{p.chapters}</span>
-                    <span>{chapterCount}</span>
-                  </div>
+                  {selectedChapters.length > 0 && selectedChapters.some((c) => c.price > 0) ? (
+                    // Chapters have individual prices — show itemised with discount applied
+                    selectedChapters.map((c) => (
+                      <div key={c.id} className="payment-summary__row payment-summary__row--chapter">
+                        <span>Bab {c.number}: {c.title?.length > 20 ? c.title.slice(0, 20) + '…' : c.title}</span>
+                        <span>{fmt(chapterFinalPrice(c))}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="payment-summary__row">
+                        <span>{p.pricePerChapter}</span>
+                        <span>{fmt(unitPrice)}</span>
+                      </div>
+                      <div className="payment-summary__row">
+                        <span>{p.chapters}</span>
+                        <span>{chapterCount}</span>
+                      </div>
+                    </>
+                  )}
                 </>
               ) : (
                 <div className="payment-summary__row">

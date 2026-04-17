@@ -1251,6 +1251,12 @@
   color: #2d8a4e;
 }
 
+.payment-summary__row--chapter {
+  font-size: 0.8rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--color-border);
+}
+
 .payment-summary__row--total {
   font-size: 1.05rem;
   font-weight: 700;

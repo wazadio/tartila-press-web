@@ -159,6 +159,15 @@
   line-height: 1;
 }
 
+.pkg-card__from {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: 0.1rem;
+}
+
 .pkg-card__unit {
   font-size: 0.8rem;
   color: var(--color-text-muted);

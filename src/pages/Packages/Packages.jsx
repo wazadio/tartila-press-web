@@ -34,7 +34,10 @@ function PackageCard({ pkg, p }) {
             <span className="pkg-card__discount-badge">-{pkg.discount}%</span>
           </div>
         )}
-        <div className="pkg-card__final">{fmt(pkg.final_price)}</div>
+        <div className="pkg-card__final">
+          {pkg.type === 'per_chapter' && <span className="pkg-card__from">Mulai dari </span>}
+          {fmt(pkg.final_price)}
+        </div>
         <div className="pkg-card__unit">
           {pkg.type === 'per_chapter' ? p.chapterUnit : p.bookUnit}
         </div>
