@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { packagesApi } from '../../services/api';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { packagesApi, booksApi } from '../../services/api';
 import { useLang } from '../../context/LanguageContext';
 import './PackageDetail.css';
 
@@ -12,16 +12,28 @@ function fmt(price) {
 
 function PackageDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { t } = useLang();
   const p = t.packages;
 
   const [pkg, setPkg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [bookList, setBookList] = useState([]);
+  const [booksLoading, setBooksLoading] = useState(false);
 
   useEffect(() => {
     packagesApi.get(id)
-      .then(setPkg)
+      .then((data) => {
+        setPkg(data);
+        if (data.type === 'per_chapter') {
+          setBooksLoading(true);
+          booksApi.list({ is_template: true })
+            .then(setBookList)
+            .catch(() => {})
+            .finally(() => setBooksLoading(false));
+        }
+      })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -73,6 +85,42 @@ function PackageDetail() {
           {pkg.description && (
             <div className="pkgdetail-desc">
               <p>{pkg.description}</p>
+            </div>
+          )}
+
+          {/* Book grid for per_chapter */}
+          {isPerChapter && (
+            <div className="pkgdetail-books">
+              <h2 className="pkgdetail-books__title">Template Buku</h2>
+              <p className="pkgdetail-books__subtitle">Klik buku untuk memilih bab yang ingin dipesan.</p>
+              {booksLoading && <p className="pkgdetail-books__loading">Memuat…</p>}
+              {!booksLoading && bookList.length === 0 && (
+                <p className="pkgdetail-books__empty">Belum ada template buku tersedia.</p>
+              )}
+              {!booksLoading && bookList.length > 0 && (
+                <div className="pkgdetail-book-grid">
+                  {bookList.map((b) => (
+                    <button
+                      key={b.id}
+                      type="button"
+                      className="pkgdetail-book-card"
+                      onClick={() => navigate(`/payment/${pkg.id}/chapters/${b.id}`)}
+                    >
+                      <div className="pkgdetail-book-card__cover-wrap">
+                        {b.cover
+                          ? <img src={b.cover} alt={b.title} className="pkgdetail-book-card__cover" />
+                          : <div className="pkgdetail-book-card__cover-placeholder">📖</div>
+                        }
+                      </div>
+                      <div className="pkgdetail-book-card__info">
+                        <div className="pkgdetail-book-card__title">{b.title}</div>
+                        {b.genre && <div className="pkgdetail-book-card__genre">{b.genre}</div>}
+                        <div className="pkgdetail-book-card__cta">Pilih Bab →</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { packagesApi, genresApi, transactionsApi, booksApi, bookChaptersApi, bidangApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
@@ -16,6 +16,7 @@ function fmt(price) {
 function Payment() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { t, lang } = useLang();
   const p = t.payment;
@@ -178,21 +179,7 @@ function Payment() {
   }
 
   function handleBookCardClick(book) {
-    setSelectedBookId(String(book.id));
-    setSelectedBook(book);
-    setSelectedChapterIds([]);
-    setAvailableChapters([]);
-    setBookConfirmed(false);
-    setForm((prev) => ({ ...prev, bookTitle: book.title || '', genre: book.genre || '' }));
-    bookChaptersApi.list(book.id)
-      .then((chs) => { setAvailableChapters(chs); })
-      .catch(() => {});
-    setBookModalOpen(true);
-  }
-
-  function handleBookConfirm() {
-    setBookConfirmed(true);
-    setBookModalOpen(false);
+    navigate(`/payment/${id}/chapters/${book.id}`);
   }
 
   function toggleChapter(chId) {
@@ -491,7 +478,7 @@ function Payment() {
                       type="button"
                       className="btn btn-secondary btn-sm"
                       style={{ marginTop: '0.75rem', width: '100%' }}
-                      onClick={() => setBookModalOpen(true)}
+                      onClick={() => navigate(`/payment/${id}/chapters/${selectedBook.id}`)}
                     >
                       Ubah Pilihan
                     </button>
@@ -617,126 +604,7 @@ function Payment() {
 
         </form>
       </div>
-      {isPerChapter && bookModalOpen && selectedBook && (
-        <>
-          <div className="book-modal__backdrop" onClick={() => setBookModalOpen(false)} />
-          <div className="book-modal" role="dialog" aria-modal="true">
 
-            {/* Hero cover strip */}
-            {selectedBook.cover && (
-              <div className="book-modal__hero">
-                <img
-                  src={selectedBook.cover}
-                  alt={selectedBook.title}
-                  className="book-modal__hero-img book-modal__cover--clickable"
-                  onClick={() => setLightboxSrc(selectedBook.cover)}
-                  title="Klik untuk memperbesar"
-                />
-                <div className="book-modal__hero-overlay">
-                  <div className="book-preview__tags">
-                    {selectedBook.bidang_name && <span className="book-preview__tag book-preview__tag--bidang">{selectedBook.bidang_name}</span>}
-                    {selectedBook.genre && <span className="book-preview__tag">{selectedBook.genre}</span>}
-                  </div>
-                  <h2 className="book-modal__hero-title">{selectedBook.title}</h2>
-                </div>
-                <button type="button" className="book-modal__close" onClick={() => setBookModalOpen(false)}>×</button>
-              </div>
-            )}
-
-            {/* Fallback header if no cover */}
-            {!selectedBook.cover && (
-              <div className="book-modal__header">
-                <div>
-                  <span className="book-modal__title">Detail Template</span>
-                  <h2 className="book-modal__header-book-title">{selectedBook.title}</h2>
-                </div>
-                <button type="button" className="book-modal__close" onClick={() => setBookModalOpen(false)}>×</button>
-              </div>
-            )}
-
-            <div className="book-modal__body">
-              {/* Synopsis */}
-              {(selectedBook.synopsis || selectedBook.description) && (
-                <div className="book-modal__synopsis">
-                  <p className="book-modal__synopsis-text">
-                    {selectedBook.synopsis || selectedBook.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Chapters */}
-              <div className="book-modal__chapters">
-                {availableChapters.length > 0 ? (
-                  <>
-                    <h3 className="book-modal__section-title">Pilih Bab yang Ingin Dipesan</h3>
-                    <div className="chapter-checklist">
-                      {availableChapters.map((ch) => {
-                        const outOfStock = ch.stock != null && ch.stock <= 0;
-                        return (
-                          <label
-                            key={ch.id}
-                            className={`chapter-checklist__item${selectedChapterIds.includes(ch.id) ? ' chapter-checklist__item--checked' : ''}${outOfStock ? ' chapter-checklist__item--disabled' : ''}`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedChapterIds.includes(ch.id)}
-                              onChange={() => toggleChapter(ch.id)}
-                              disabled={outOfStock}
-                            />
-                            <span className="chapter-checklist__num">Bab {ch.number}</span>
-                            <span className="chapter-checklist__title">{ch.title}</span>
-                            {ch.price > 0 && <span className="chapter-checklist__price">{fmt(ch.price)}</span>}
-                            {ch.stock != null && (
-                              <span className={`chapter-checklist__stock${outOfStock ? ' chapter-checklist__stock--empty' : ''}`}>
-                                {outOfStock ? 'Habis' : `Sisa ${ch.stock}`}
-                              </span>
-                            )}
-                          </label>
-                        );
-                      })}
-                    </div>
-                    {errors.chapters && <p className="error-msg" style={{ marginTop: '0.5rem' }}>{errors.chapters}</p>}
-                    {selectedChapterIds.length > 0 && (
-                      <p className="chapter-hint" style={{ marginTop: '0.5rem' }}>
-                        {selectedChapterIds.length} bab dipilih
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <h3 className="book-modal__section-title">Jumlah Bab</h3>
-                    <div className="chapter-selector">
-                      <button type="button" className="chapter-btn" onClick={() => setChapters((c) => Math.max(1, c - 1))}>−</button>
-                      <input
-                        type="number" min="1" value={chapters}
-                        onChange={(e) => setChapters(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="chapter-input"
-                      />
-                      <button type="button" className="chapter-btn" onClick={() => setChapters((c) => c + 1)}>+</button>
-                      <span className="chapter-label">{p.chaptersUnit}</span>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="book-modal__footer">
-              <div className="book-modal__total">
-                <span className="book-modal__total-label">Estimasi Biaya</span>
-                <span className="book-modal__total-price">{fmt(total)}</span>
-              </div>
-              <button
-                type="button"
-                className="btn btn-primary book-modal__confirm"
-                onClick={handleBookConfirm}
-                disabled={availableChapters.length > 0 && selectedChapterIds.length === 0}
-              >
-                Lanjutkan ke Pembayaran →
-              </button>
-            </div>
-          </div>
-        </>
-      )}
 
       {/* ── Filter Drawer ── */}
       {isPerChapter && (

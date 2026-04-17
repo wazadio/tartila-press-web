@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import BookEditor from './pages/BookEditor/BookEditor';
 import Packages from './pages/Packages/Packages';
 import PackageDetail from './pages/PackageDetail/PackageDetail';
+import ChapterSelect from './pages/ChapterSelect/ChapterSelect';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
@@ -64,6 +65,7 @@ function AppRoutes() {
           <Route path="/writer/register" element={<WriterRegister />} />
           <Route path="/writer/dashboard" element={<WriterRoute><WriterDashboard /></WriterRoute>} />
           <Route path="/payment/:id" element={<Payment />} />
+          <Route path="/payment/:id/chapters/:bookId" element={<ChapterSelect />} />
           <Route path="/my-orders" element={<MyTransactions />} />
           <Route path="/buy/:id" element={<BuyBook />} />
         </Routes>
