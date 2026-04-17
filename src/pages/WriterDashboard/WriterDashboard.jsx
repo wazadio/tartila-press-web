@@ -207,8 +207,12 @@ function WriterDashboard() {
       const [uploaded, ocr] = await Promise.all(tasks);
       setForm((f) => ({ ...f, ktp_photo: uploaded.url }));
       if (ocr?.extracted && Object.keys(ocr.extracted).length > 0) {
-        const { creator_name: _n, ...rest } = ocr.extracted;
-        setForm((f) => ({ ...f, ...rest }));
+        const { creator_name, ...rest } = ocr.extracted;
+        setForm((f) => ({
+          ...f,
+          ...rest,
+          ...(creator_name ? { name: creator_name } : {}),
+        }));
         setSuccess('KTP berhasil dibaca. Periksa dan koreksi data yang terisi otomatis.');
       }
     } catch (err) {
@@ -298,6 +302,28 @@ function WriterDashboard() {
             </div>
           ) : (
             <form className="writer-dash__edit-form" onSubmit={handleSave}>
+              {/* KTP Upload — paling atas agar OCR bisa isi Nama, Jenis Kelamin, dll */}
+              <div className="form-group creator-ktp-group">
+                <label>
+                  Foto KTP
+                  <span className="creator-field-hint"> (PNG / JPG / PDF, maks. 5 MB — Nama, NIK &amp; data lain diisi otomatis via OCR)</span>
+                </label>
+                <div className="creator-ktp-row">
+                  {form.ktp_photo && (
+                    <a href={form.ktp_photo} target="_blank" rel="noopener noreferrer" className="creator-ktp-thumb">
+                      <img src={form.ktp_photo} alt="KTP" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                    </a>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,application/pdf"
+                    onChange={handleKtpFileChange}
+                    disabled={ktpUploading}
+                  />
+                </div>
+                {ktpUploading && <span className="creator-ktp-status">Mengunggah &amp; membaca KTP…</span>}
+              </div>
+
               <div className="writer-photo-row">
                 <div className="writer-dash__avatar writer-dash__avatar--sm">
                   {form.photo
@@ -371,28 +397,6 @@ function WriterDashboard() {
               <div className="writer-dash__pencipta-divider">
                 <span>Profil Pencipta</span>
                 <span className="creator-field-hint"> — untuk dokumen hak cipta &amp; penerbitan</span>
-              </div>
-
-              {/* KTP Upload + OCR — paling atas */}
-              <div className="form-group creator-ktp-group">
-                <label>
-                  Foto KTP
-                  <span className="creator-field-hint"> (PNG / JPG / PDF, maks. 5 MB — NIK &amp; data diisi otomatis via OCR)</span>
-                </label>
-                <div className="creator-ktp-row">
-                  {form.ktp_photo && (
-                    <a href={form.ktp_photo} target="_blank" rel="noopener noreferrer" className="creator-ktp-thumb">
-                      <img src={form.ktp_photo} alt="KTP" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-                    </a>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,application/pdf"
-                    onChange={handleKtpFileChange}
-                    disabled={ktpUploading}
-                  />
-                </div>
-                {ktpUploading && <span className="creator-ktp-status">Mengunggah &amp; membaca KTP…</span>}
               </div>
 
               <div className="creator-form-grid">
