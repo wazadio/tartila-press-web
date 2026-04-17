@@ -17,7 +17,7 @@ function Payment() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { t, lang } = useLang();
   const p = t.payment;
 
@@ -207,7 +207,7 @@ function Payment() {
     if (!form.name.trim()) errs.name = p.nameRequired;
     if (!form.email.trim()) errs.email = p.emailRequired;
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = p.emailInvalid;
-    if (!form.phone.trim()) errs.phone = p.phoneRequired;
+    if (!user?.phone && !form.phone.trim()) errs.phone = p.phoneRequired;
     return errs;
   }
 
@@ -224,9 +224,9 @@ function Payment() {
         book_title: form.bookTitle,
         genre: form.genre,
         chapters: chapterCount,
-        customer_name: form.name,
-        customer_email: form.email,
-        customer_phone: form.phone,
+        customer_name: user?.name || form.name,
+        customer_email: user?.email || form.email,
+        customer_phone: user?.phone || form.phone,
         notes: [
           form.notes,
           selectedChapters.length > 0
@@ -240,6 +240,10 @@ function Payment() {
       setBankName(created.bank_name || bankName);
       setBankAccountName(created.bank_account_name || bankAccountName);
       setBankAccountNumber(created.bank_account_number || bankAccountNumber);
+      // Save phone to user profile if they entered it and don't have one yet
+      if (user && !user.phone && form.phone.trim()) {
+        updateProfile({ phone: form.phone.trim() }).catch(() => {});
+      }
       setSubmitted(true);
     } catch (err) {
       setSubmitError(err.message || p.submitFailed);
@@ -495,31 +499,54 @@ function Payment() {
 
             <div className="payment-section">
               <h2 className="payment-section__title">{p.contactInfo}</h2>
-              <div className="form-group">
-                <label>{p.name} *</label>
-                <input
-                  name="name" type="text" value={form.name}
-                  onChange={handleChange} className={errors.name ? 'input-error' : ''}
-                />
-                {errors.name && <span className="error-msg">{errors.name}</span>}
-              </div>
-              <div className="form-group">
-                <label>{p.email} *</label>
-                <input
-                  name="email" type="email" value={form.email}
-                  onChange={handleChange} className={errors.email ? 'input-error' : ''}
-                />
-                {errors.email && <span className="error-msg">{errors.email}</span>}
-              </div>
-              <div className="form-group">
-                <label>{p.phone} *</label>
-                <input
-                  name="phone" type="tel" value={form.phone}
-                  onChange={handleChange} placeholder={p.phonePlaceholder}
-                  className={errors.phone ? 'input-error' : ''}
-                />
-                {errors.phone && <span className="error-msg">{errors.phone}</span>}
-              </div>
+              {user ? (
+                <div className="payment-user-info">
+                  <div className="payment-user-info__row">
+                    <span className="payment-user-info__label">{p.name}</span>
+                    <span className="payment-user-info__value">{user.name}</span>
+                  </div>
+                  <div className="payment-user-info__row">
+                    <span className="payment-user-info__label">{p.email}</span>
+                    <span className="payment-user-info__value">{user.email}</span>
+                  </div>
+                  {user.phone && (
+                    <div className="payment-user-info__row">
+                      <span className="payment-user-info__label">{p.phone}</span>
+                      <span className="payment-user-info__value">{user.phone}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label>{p.name} *</label>
+                    <input
+                      name="name" type="text" value={form.name}
+                      onChange={handleChange} className={errors.name ? 'input-error' : ''}
+                    />
+                    {errors.name && <span className="error-msg">{errors.name}</span>}
+                  </div>
+                  <div className="form-group">
+                    <label>{p.email} *</label>
+                    <input
+                      name="email" type="email" value={form.email}
+                      onChange={handleChange} className={errors.email ? 'input-error' : ''}
+                    />
+                    {errors.email && <span className="error-msg">{errors.email}</span>}
+                  </div>
+                </>
+              )}
+              {!user?.phone && (
+                <div className="form-group">
+                  <label>{p.phone} *</label>
+                  <input
+                    name="phone" type="tel" value={form.phone}
+                    onChange={handleChange} placeholder={p.phonePlaceholder}
+                    className={errors.phone ? 'input-error' : ''}
+                  />
+                  {errors.phone && <span className="error-msg">{errors.phone}</span>}
+                </div>
+              )}
               <div className="form-group">
                 <label>{p.notes}</label>
                 <textarea

@@ -32,6 +32,7 @@ export const authApi = {
   register: (body) => request('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
   login: (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   me: () => request('/auth/me'),
+  updateMe: (body) => request('/auth/me', { method: 'PATCH', body: JSON.stringify(body) }),
   verify: (token) => request(`/auth/verify?token=${token}`),
 };
 
@@ -83,7 +84,6 @@ export const uploadsApi = {
     const res = await fetch(`${BASE_URL}/uploads/image`, { method: 'POST', headers, body });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Upload failed');
-    // Resolve to absolute URL so <img> works from the FE dev server
     const base = BASE_URL.replace('/api', '');
     return { ...data, url: `${base}${data.url}` };
   },
@@ -99,6 +99,31 @@ export const uploadsApi = {
     if (!res.ok) throw new Error(data.detail || 'Upload gagal');
     const base = BASE_URL.replace('/api', '');
     return { ...data, url: `${base}${data.url}` };
+  },
+
+  uploadKtp: async (file) => {
+    const token = getToken();
+    const body = new FormData();
+    body.append('file', file);
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${BASE_URL}/uploads/ktp-upload`, { method: 'POST', headers, body });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Upload KTP gagal');
+    const base = BASE_URL.replace('/api', '');
+    return { ...data, url: `${base}${data.url}` };
+  },
+
+  ocrKtp: async (file) => {
+    const token = getToken();
+    const body = new FormData();
+    body.append('file', file);
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${BASE_URL}/uploads/ktp-ocr`, { method: 'POST', headers, body });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'OCR KTP gagal');
+    return data; // { extracted: { nik, gender, address, district } }
   },
 };
 

@@ -818,6 +818,39 @@
   margin-bottom: 1.25rem;
 }
 
+/* User info display (logged in) */
+.payment-user-info {
+  background: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.payment-user-info__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 0.88rem;
+}
+
+.payment-user-info__label {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.payment-user-info__value {
+  font-weight: 600;
+  color: var(--color-navy);
+  text-align: right;
+  word-break: break-all;
+}
+
 .payment-layout .form-group {
   display: flex;
   flex-direction: column;
