@@ -4,7 +4,7 @@ import { authorsApi, booksApi, packagesApi, genresApi, transactionsApi, bidangAp
 import { useLang } from '../../context/LanguageContext';
 import './AdminDashboard.css';
 
-const EMPTY_PKG = { name: '', type: 'per_chapter', description: '', price: '', discount: 0 };
+const EMPTY_PKG = { name: '', type: 'per_chapter', description: '', price: '', discount: 0, sort_order: 0, is_featured: false };
 const EMPTY_GENRE = { name: '', name_id: '' };
 const EMPTY_BIDANG = { name: '' };
 
@@ -272,7 +272,7 @@ function PackageForm({ initial, onSave, onCancel, a }) {
     if (!form.price || Number(form.price) <= 0) return setError(a.priceRequired);
     setSaving(true);
     try {
-      await onSave({ ...form, price: Number(form.price), discount: Number(form.discount) });
+      await onSave({ ...form, price: Number(form.price), discount: Number(form.discount), sort_order: Number(form.sort_order) || 0 });
     } catch (err) {
       setError(err.message || a.saveFailed);
     } finally {
@@ -308,6 +308,20 @@ function PackageForm({ initial, onSave, onCancel, a }) {
           <label>{a.pkgDiscount}</label>
           <input type="number" min="0" max="100" value={form.discount} onChange={(e) => set('discount', e.target.value)} placeholder={a.pkgDiscountPlaceholder} />
         </div>
+        <div className="pkg-form__field pkg-form__field--sm">
+          <label>Urutan (Order)</label>
+          <input type="number" min="0" value={form.sort_order ?? 0} onChange={(e) => set('sort_order', e.target.value)} placeholder="0" />
+        </div>
+      </div>
+      <div className="pkg-form__field">
+        <label className="pkg-form__checkbox-label">
+          <input
+            type="checkbox"
+            checked={!!form.is_featured}
+            onChange={(e) => set('is_featured', e.target.checked)}
+          />
+          <span>Tampilkan sebagai <strong>Unggulan</strong> (badge &quot;Paling Populer&quot;)</span>
+        </label>
       </div>
       {error && <p className="error-msg">{error}</p>}
       <div className="pkg-form__actions">
@@ -764,17 +778,20 @@ function AdminDashboard() {
                 <table className="admin-table">
                   <thead>
                     <tr>
+                      <th>Urutan</th>
                       <th>{a.colName}</th>
                       <th>{a.colType}</th>
                       <th>{a.colPrice}</th>
                       <th>{a.colDiscount}</th>
                       <th>{a.colFinalPrice}</th>
+                      <th>Unggulan</th>
                       <th>{a.colActions}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {packages.map((pkg) => (
                       <tr key={pkg.id}>
+                        <td style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontWeight: 600 }}>{pkg.sort_order ?? 0}</td>
                         <td style={{ fontWeight: 600 }}>{pkg.name}</td>
                         <td>
                           <span className="badge">
@@ -790,6 +807,11 @@ function AdminDashboard() {
                           )}
                         </td>
                         <td style={{ fontWeight: 600 }}>{fmt(pkg.final_price)}</td>
+                        <td>
+                          <span className={`status-dot ${pkg.is_featured ? 'status-dot--yes' : 'status-dot--no'}`}>
+                            {pkg.is_featured ? a.yes : a.no}
+                          </span>
+                        </td>
                         <td>
                           <div className="admin-actions">
                             <button className="btn btn-secondary btn-sm" onClick={() => startEditPkg(pkg)}>{a.edit}</button>

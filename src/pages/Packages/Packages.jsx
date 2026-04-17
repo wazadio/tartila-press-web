@@ -15,7 +15,7 @@ function fmt(price) {
 
 function PackageCard({ pkg, p }) {
   const hasDiscount = pkg.discount > 0;
-  const isFeatured = hasDiscount;
+  const isFeatured = pkg.is_featured;
 
   return (
     <div className={`pkg-card ${isFeatured ? 'pkg-card--featured' : ''}`}>
