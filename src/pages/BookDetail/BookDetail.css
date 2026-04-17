@@ -112,12 +112,14 @@
 }
 
 .book-detail__description {
+  white-space: pre-line;
   font-size: 1rem;
   line-height: 1.8;
   color: var(--color-text);
   border-left: 3px solid var(--color-brass);
   padding-left: 1.25rem;
   font-style: italic;
+  margin: 0;
 }
 
 .book-detail__table {

@@ -411,9 +411,10 @@
 }
 
 .book-modal__synopsis-text {
+  white-space: pre-line;
   font-size: 0.9rem;
   color: var(--color-text-muted);
-  line-height: 1.7;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -1230,7 +1231,7 @@
   font-size: 0.82rem;
   color: var(--color-text-muted);
   line-height: 1.5;
-  margin-bottom: 0.75rem;
+  margin: 0 0 0.75rem;
 }
 
 .payment-summary__divider {
