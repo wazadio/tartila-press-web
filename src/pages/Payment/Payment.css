@@ -1226,6 +1226,7 @@
 }
 
 .payment-summary__desc {
+  white-space: pre-line;
   font-size: 0.82rem;
   color: var(--color-text-muted);
   line-height: 1.5;
