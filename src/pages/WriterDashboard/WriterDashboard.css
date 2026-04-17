@@ -47,7 +47,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 2rem;
-  max-width: 560px;
+  max-width: 720px;
   box-shadow: var(--shadow);
   position: relative;
 }
@@ -184,6 +184,56 @@
   gap: 1rem;
 }
 
+/* Form group base */
+.writer-dash__edit-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.writer-dash__edit-form .form-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.writer-dash__edit-form .form-group input,
+.writer-dash__edit-form .form-group select,
+.writer-dash__edit-form .form-group textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  background-color: var(--color-paper);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.writer-dash__edit-form .form-group input:focus,
+.writer-dash__edit-form .form-group select:focus {
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px rgba(29, 43, 72, 0.08);
+  background-color: #fff;
+}
+
+.writer-dash__edit-form .form-group input[type="file"] {
+  padding: 0.4rem 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .writer-dash__form-actions {
   display: flex;
   gap: 0.75rem;
@@ -283,6 +333,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0 1.25rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.creator-form-grid > .form-group {
+  min-width: 0;
 }
 
 .creator-full-col {
@@ -305,6 +361,8 @@
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .creator-ktp-thumb {
@@ -330,11 +388,14 @@
   margin-top: 0.4rem;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   .creator-form-grid {
     grid-template-columns: 1fr;
   }
   .creator-full-col {
     grid-column: 1;
+  }
+  .writer-dash__card {
+    padding: 1.25rem;
   }
 }

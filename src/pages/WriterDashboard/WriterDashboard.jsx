@@ -373,10 +373,11 @@ function WriterDashboard() {
                 <span className="creator-field-hint"> — untuk dokumen hak cipta &amp; penerbitan</span>
               </div>
 
-              {/* KTP Upload + OCR */}
+              {/* KTP Upload + OCR — paling atas */}
               <div className="form-group creator-ktp-group">
                 <label>
-                  Foto KTP <span className="creator-field-hint">(PNG / JPG / PDF, maks. 5 MB — data diisi otomatis via OCR)</span>
+                  Foto KTP
+                  <span className="creator-field-hint"> (PNG / JPG / PDF, maks. 5 MB — NIK &amp; data diisi otomatis via OCR)</span>
                 </label>
                 <div className="creator-ktp-row">
                   {form.ktp_photo && (
