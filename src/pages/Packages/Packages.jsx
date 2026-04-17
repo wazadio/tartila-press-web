@@ -43,7 +43,10 @@ function PackageCard({ pkg, p }) {
         </div>
       </div>
 
-      <Link to={`/payment/${pkg.id}`} className="btn btn-primary pkg-card__cta">{p.getStarted}</Link>
+      <div className="pkg-card__actions">
+        <Link to={`/packages/${pkg.id}`} className="btn btn-secondary pkg-card__detail">Lihat Detail</Link>
+        <Link to={`/payment/${pkg.id}`} className="btn btn-primary pkg-card__cta">{p.getStarted}</Link>
+      </div>
     </div>
   );
 }

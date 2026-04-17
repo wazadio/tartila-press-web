@@ -11,6 +11,7 @@ import AuthorDetail from './pages/AuthorDetail/AuthorDetail';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import BookEditor from './pages/BookEditor/BookEditor';
 import Packages from './pages/Packages/Packages';
+import PackageDetail from './pages/PackageDetail/PackageDetail';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import AuthCallback from './pages/AuthCallback/AuthCallback';
@@ -50,6 +51,7 @@ function AppRoutes() {
           <Route path="/authors" element={<AuthorList />} />
           <Route path="/authors/:id" element={<AuthorDetail />} />
           <Route path="/packages" element={<Packages />} />
+          <Route path="/packages/:id" element={<PackageDetail />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/books/new" element={<AdminRoute><BookEditor /></AdminRoute>} />
           <Route path="/admin/books/:id/edit" element={<AdminRoute><BookEditor /></AdminRoute>} />

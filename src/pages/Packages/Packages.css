@@ -176,12 +176,20 @@
   margin-top: 0.2rem;
 }
 
-.pkg-card__cta {
+.pkg-card__actions {
   margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pkg-card__detail,
+.pkg-card__cta {
   text-align: center;
   width: 100%;
   justify-content: center;
 }
+
 
 /* ── Comparison table ──────────────────────────────────────────────────────── */
 .packages-compare {
